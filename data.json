@@ -1,0 +1,58 @@
+[
+  {
+    "id": "root",
+    "name": "Kepala Keluarga Besar",
+    "parentId": null,
+    "spouse": "",
+    "bio": "Pangkal Nasab.",
+    "phone": "",
+    "address": "",
+    "photo": ""
+  },
+  {
+    "id": "1775130897326",
+    "name": "1",
+    "parentId": "root",
+    "spouse": "",
+    "bio": "",
+    "phone": "",
+    "address": "",
+    "photo": ""
+  },
+  {
+    "id": "1775134143934",
+    "name": "1",
+    "parentId": null,
+    "spouse": "",
+    "bio": "",
+    "phone": "",
+    "photo": ""
+  },
+  {
+    "id": "1775134150458",
+    "name": "1",
+    "parentId": "root",
+    "spouse": "",
+    "bio": "",
+    "phone": "",
+    "photo": ""
+  },
+  {
+    "id": "1775134154937",
+    "name": "1",
+    "parentId": "root",
+    "spouse": "",
+    "bio": "",
+    "phone": "",
+    "photo": ""
+  },
+  {
+    "id": "1775136458757",
+    "name": "1",
+    "parentId": "root",
+    "spouse": "",
+    "bio": "",
+    "phone": "",
+    "photo": ""
+  }
+]
