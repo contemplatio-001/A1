@@ -3,22 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
-    <title>Nasab Pro - Blue Enterprise</title>
+    <title>Nasab Pro - Blue AutoCloud</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { 
-            --primary: #1a5276; /* Biru Tua Deep */
-            --secondary: #2980b9; /* Biru Natural */
-            --accent: #d4e6f1; /* Biru Sangat Muda */
-            --success-blue: #2471a3;
-            --wa: #25d366; 
-            --bg: #f4f7fb; 
-        }
-        
+        :root { --primary: #1a5276; --secondary: #2980b9; --accent: #d4e6f1; --wa: #25d366; --bg: #f4f7fb; }
         body { background-color: var(--bg); font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; overflow: hidden; height: 100vh; width: 100vw; color: #333; }
 
-        /* LOGIN PAGE */
+        /* LOGIN */
         #login-page {
             height: 100vh; display: flex; align-items: center; justify-content: center;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
@@ -28,8 +20,7 @@
         /* NAVIGATION & SIDEBAR */
         .navbar { background-color: var(--primary) !important; z-index: 1050; border-bottom: 3px solid var(--secondary); }
         .offcanvas { background-color: var(--primary); color: white; width: 280px !important; }
-        .offcanvas-header { border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .nav-link-custom { color: white; padding: 12px 20px; display: flex; align-items: center; text-decoration: none; border-radius: 8px; margin-bottom: 5px; transition: 0.3s; }
+        .nav-link-custom { color: white; padding: 12px 20px; display: flex; align-items: center; text-decoration: none; border-radius: 8px; margin-bottom: 5px; }
         .nav-link-custom:hover { background: rgba(255,255,255,0.2); color: #fff; }
         .nav-link-custom i { width: 30px; font-size: 1.1rem; }
 
@@ -38,7 +29,6 @@
         .viewport:active { cursor: grabbing; }
         .tree-wrapper { position: absolute; transform-origin: 0 0; padding: 150px; display: inline-block; transition: transform 0.1s ease-out; }
 
-        /* Garis Pohon */
         .tree ul { padding-top: 25px; position: relative; display: flex; justify-content: center; padding-left: 0; }
         .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 25px 5px 0 5px; }
         .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #3498db; width: 50%; height: 25px; }
@@ -50,24 +40,23 @@
         .tree li:first-child::after { border-radius: 5px 0 0 0; }
         .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #3498db; width: 0; height: 25px; }
 
-        /* KARTU ANGGOTA */
+        /* KARTU */
         .person-card {
             border: 2px solid #d4e6f1; padding: 12px; display: inline-block; border-radius: 15px;
             background-color: white; min-width: 150px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
             cursor: pointer; position: relative; z-index: 10; transition: 0.3s;
         }
         .person-card:hover { border-color: var(--secondary); transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
-        .person-card .name { font-weight: bold; color: var(--primary); font-size: 0.9rem; margin-bottom: 2px; }
+        .person-card .name { font-weight: bold; color: var(--primary); font-size: 0.9rem; }
         .person-card .spouse { font-size: 0.75rem; color: #e74c3c; margin-top: 4px; border-top: 1px dashed #d4e6f1; padding-top: 4px; font-style: italic; }
         .gen-tag { background: var(--secondary); color: white; padding: 1px 8px; border-radius: 10px; font-size: 0.6rem; margin-bottom: 5px; display: inline-block; font-weight: bold; }
 
-        /* GRID VIEW (Filter Per Gen) */
+        /* GRID VIEW */
         .gen-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding: 30px; }
 
         /* ZOOM CONTROLS */
         .zoom-controls { position: fixed; bottom: 25px; right: 25px; display: flex; flex-direction: column; gap: 12px; z-index: 2000; }
-        .btn-zoom { width: 50px; height: 50px; border-radius: 50%; background: white; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.2); font-size: 1.3rem; color: var(--primary); display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .btn-zoom:active { transform: scale(0.9); }
+        .btn-zoom { width: 50px; height: 50px; border-radius: 50%; background: white; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.2); font-size: 1.3rem; color: var(--primary); display: flex; align-items: center; justify-content: center; }
 
         /* CONTEXT MENU */
         #custom-menu { position: absolute; display: none; z-index: 4000; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); min-width: 190px; overflow: hidden; border: 1px solid var(--accent); }
@@ -75,16 +64,9 @@
         .menu-item:hover { background: #f0f7ff; color: var(--secondary); }
         .menu-item i { width: 28px; color: var(--secondary); }
 
-        /* MODALS */
-        .modal-content { border-radius: 20px; border: none; overflow: hidden; }
-        .modal-header { background: var(--primary); color: white; }
-        .profile-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 15px; }
-        .stat-box { padding: 10px; border-radius: 12px; background: #f1f4f9; border: 1px solid #e1e8f0; }
-        .stat-value { font-size: 1.2rem; font-weight: bold; color: var(--primary); display: block; }
-        .stat-label { font-size: 0.65rem; color: #7f8c8d; text-transform: uppercase; }
-        .lineage-path-box { background: var(--accent); padding: 12px; border-radius: 10px; color: var(--primary); font-size: 0.85rem; font-weight: 600; text-align: left; margin-bottom: 15px; }
-
         .hidden { display: none !important; }
+        .profile-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 15px; }
+        .lineage-path-box { background: var(--accent); padding: 10px; border-radius: 10px; color: var(--primary); font-size: 0.85rem; font-weight: 600; text-align: left; margin-bottom: 15px; }
         .sync-status { font-size: 0.7rem; margin-left: 8px; font-weight: normal; }
     </style>
 </head>
@@ -96,15 +78,15 @@
         <div class="text-center mb-4">
             <div class="bg-primary text-white d-inline-block p-3 rounded-circle mb-3"><i class="fas fa-sitemap fa-2x"></i></div>
             <h4 class="fw-bold" style="color: var(--primary);">Nasab Pro</h4>
-            <p class="text-muted small">Blue Enterprise Edition</p>
+            <p class="text-muted small">Input satu kali, tampil di semua komputer.</p>
         </div>
-        <div class="mb-3"><label class="small fw-bold">Username</label><input type="text" id="username" class="form-control rounded-pill px-3"></div>
-        <div class="mb-3"><label class="small fw-bold">Password</label><input type="password" id="password" class="form-control rounded-pill px-3"></div>
-        <button class="btn btn-primary w-100 py-2 fw-bold rounded-pill" onclick="login()">MASUK SISTEM</button>
+        <div class="mb-3"><label class="small fw-bold">Username</label><input type="text" id="username" class="form-control rounded-pill px-3" placeholder="Masukkan User"></div>
+        <div class="mb-3"><label class="small fw-bold">Password</label><input type="password" id="password" class="form-control rounded-pill px-3" placeholder="Masukkan Pass"></div>
+        <button class="btn btn-primary w-100 py-2 fw-bold rounded-pill" onclick="login()">LOGIN</button>
     </div>
 </div>
 
-<!-- MAIN APP -->
+<!-- APP -->
 <div id="main-app" class="hidden">
     <nav class="navbar navbar-dark shadow-sm px-2">
         <div class="container-fluid">
@@ -114,12 +96,10 @@
         </div>
     </nav>
 
-    <!-- VIEWPORT -->
     <div class="viewport" id="viewport">
         <div class="tree-wrapper" id="tree-wrapper"><div id="tree-root" class="tree"></div></div>
     </div>
 
-    <!-- ZOOM -->
     <div class="zoom-controls">
         <button class="btn-zoom" onclick="changeZoom(0.2)"><i class="fas fa-plus"></i></button>
         <button class="btn-zoom" onclick="changeZoom(-0.2)"><i class="fas fa-minus"></i></button>
@@ -128,20 +108,16 @@
 
     <!-- SIDEBAR -->
     <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar">
-        <div class="offcanvas-header">
-            <h5 class="fw-bold mb-0">NAVIGASI</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
-        </div>
+        <div class="offcanvas-header text-white"><h5 class="fw-bold mb-0">NAVIGASI</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button></div>
         <div class="offcanvas-body">
             <a href="#" class="nav-link-custom" onclick="goHome()" data-bs-dismiss="offcanvas"><i class="fas fa-home"></i> Beranda Utama</a>
             <div class="px-3 my-3">
                 <label class="small text-white-50 d-block mb-1">Filter Generasi:</label>
                 <select id="gen-filter" class="form-select form-select-sm bg-dark text-white border-secondary" onchange="resetFocusAndRender()" data-bs-dismiss="offcanvas"></select>
             </div>
-            <a href="#" class="nav-link-custom" onclick="syncWithCloud()" data-bs-dismiss="offcanvas"><i class="fas fa-cloud-download-alt"></i> Sinkronisasi Cloud</a>
-            <a href="#" class="nav-link-custom" onclick="openGhSettings()" data-bs-dismiss="offcanvas"><i class="fas fa-cog"></i> Konfigurasi GitHub</a>
+            <a href="#" class="nav-link-custom" onclick="syncWithCloud()" data-bs-dismiss="offcanvas"><i class="fas fa-sync"></i> Paksa Sinkron Cloud</a>
             <div id="admin-only-menu" class="hidden">
-                <a href="#" class="nav-link-custom" onclick="openUserManagement()" data-bs-dismiss="offcanvas"><i class="fas fa-users-cog"></i> Kelola Akun Login</a>
+                <a href="#" class="nav-link-custom" onclick="openUserManagement()" data-bs-dismiss="offcanvas"><i class="fas fa-users-cog"></i> Kelola Akun</a>
             </div>
             <hr class="border-secondary">
             <a href="#" class="nav-link-custom text-warning" onclick="logout()"><i class="fas fa-power-off"></i> Keluar</a>
@@ -149,142 +125,105 @@
     </div>
 </div>
 
-<!-- MODAL DETAIL -->
-<div class="modal fade" id="detailModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-body text-center p-4">
-                <button type="button" class="btn-close float-end" data-bs-dismiss="modal"></button>
-                <img id="detImg" src="" class="profile-img">
-                <h4 id="detName" class="fw-bold mb-0" style="color: var(--primary);"></h4>
-                <p id="detSpouse" class="text-danger small fw-bold mb-3"></p>
-                <div id="detLineage" class="lineage-path-box"></div>
-                <div class="row g-2 mb-3">
-                    <div class="col-4"><div class="stat-box"><span class="stat-label">Gen</span><span id="detGen" class="stat-value"></span></div></div>
-                    <div class="col-4"><div class="stat-box"><span class="stat-label">Anak</span><span id="detChildren" class="stat-value"></span></div></div>
-                    <div class="col-4"><div class="stat-box"><span class="stat-label">Opsi</span><button class="btn btn-link btn-sm p-0 d-block w-100 fw-bold" onclick="setFocusTree()">FOKUS</button></div></div>
-                </div>
-                <div class="text-start bg-light p-3 rounded small mb-3" id="detBio" style="border-left: 3px solid var(--secondary);"></div>
-                <div id="contact-area"></div>
-            </div>
-        </div>
+<!-- MODALS (Detail, Form Anggota, Kelola User) -->
+<div class="modal fade" id="detailModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-body text-center p-4">
+    <button type="button" class="btn-close float-end" data-bs-dismiss="modal"></button>
+    <img id="detImg" src="" class="profile-img">
+    <h4 id="detName" class="fw-bold mb-0" style="color: var(--primary);"></h4>
+    <p id="detSpouse" class="text-danger small fw-bold mb-3"></p>
+    <div id="detLineage" class="lineage-path-box"></div>
+    <div class="row g-2 mb-3">
+        <div class="col-4"><div class="stat-box"><span class="stat-label">Gen</span><span id="detGen" class="stat-value"></span></div></div>
+        <div class="col-4"><div class="stat-box"><span class="stat-label">Anak</span><span id="detChildren" class="stat-value"></span></div></div>
+        <div class="col-4"><div class="stat-box"><span class="stat-label">Opsi</span><button class="btn btn-link btn-sm p-0 d-block w-100 fw-bold" onclick="setFocusTree()">FOKUS</button></div></div>
     </div>
-</div>
-
-<!-- MODAL FORM DATA -->
-<div class="modal fade" id="nodeModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content">
-            <div class="modal-header border-0"><h6 class="fw-bold mb-0">Data Anggota</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body">
-                <div class="text-center mb-2">
-                    <img id="img-preview" src="" style="width:70px;height:70px;border-radius:50%;display:none;margin-bottom:8px;object-fit:cover;border:2px solid var(--secondary);">
-                    <input type="file" id="inputPhoto" class="form-control form-control-sm" accept="image/*" onchange="previewFile()">
-                </div>
-                <input type="text" id="inputName" class="form-control form-control-sm mb-2" placeholder="Nama Lengkap">
-                <div id="extended-fields">
-                    <input type="number" id="inputPhone" class="form-control form-control-sm mb-2" placeholder="WA (628...)">
-                    <textarea id="inputBio" class="form-control form-control-sm mb-2" rows="3" placeholder="Biografi..."></textarea>
-                </div>
-                <button class="btn btn-primary w-100 fw-bold btn-sm rounded-pill" onclick="saveData()">SIMPAN</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL USER MANAGEMENT -->
-<div class="modal fade" id="userManagementModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-warning border-0 text-dark"><h6 class="fw-bold mb-0">Kelola Akun Login</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body p-0">
-                <div class="p-3"><button class="btn btn-primary btn-sm rounded-pill" onclick="openUserForm('add')">Tambah Akun</button></div>
-                <table class="table table-hover table-sm mb-0">
-                    <thead class="table-light"><tr><th>Username</th><th>Role</th><th>Aksi</th></tr></thead>
-                    <tbody id="user-table-body"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL FORM USER -->
-<div class="modal fade" id="userFormModal" tabindex="-1">
-    <div class="modal-dialog modal-sm modal-dialog-centered">
-        <div class="modal-content"><div class="modal-body">
-            <h6 class="fw-bold mb-3">Form Akun</h6>
-            <input type="hidden" id="reg-old-id">
-            <input type="text" id="reg-username" class="form-control form-control-sm mb-2" placeholder="Username">
-            <input type="text" id="reg-password" class="form-control form-control-sm mb-2" placeholder="Password">
-            <select id="reg-role" class="form-select form-select-sm mb-3">
-                <option value="administrator">Administrator (Full)</option>
-                <option value="admin">Admin (Edit/Tambah)</option>
-                <option value="viewer">User (Lihat)</option>
-            </select>
-            <button class="btn btn-primary w-100 btn-sm fw-bold rounded-pill" onclick="saveAccount()">SIMPAN</button>
-        </div></div>
-    </div>
-</div>
-
-<!-- GITHUB CONFIG -->
-<div class="modal fade" id="ghSettingsModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-sm"><div class="modal-content"><div class="modal-body">
-    <h6 class="fw-bold mb-3">GitHub Settings</h6>
-    <input type="password" id="gh-token" class="form-control mb-2" placeholder="GitHub Personal Token">
-    <input type="text" id="gh-owner" class="form-control mb-2" placeholder="Username GitHub">
-    <input type="text" id="gh-repo" class="form-control mb-2" placeholder="Repository Name">
-    <button class="btn btn-primary w-100 btn-sm fw-bold rounded-pill" onclick="saveGhConfig()">CONNECT & SYNC</button>
+    <div class="text-start bg-light p-3 rounded small mb-3" id="detBio"></div>
+    <div id="contact-area"></div>
 </div></div></div></div>
 
-<!-- CONTEXT MENU -->
-<div id="custom-menu">
-    <div class="p-2 border-bottom small fw-bold text-muted">MENU AKSI</div>
-    <div id="group-staff" class="hidden">
-        <button class="menu-item" onclick="handleMenuAction('child')"><i class="fas fa-child"></i> Tambah Anak</button>
-        <button class="menu-item" onclick="handleMenuAction('spouse')"><i class="fas fa-ring"></i> Tambah Pasangan</button>
-        <button class="menu-item" onclick="handleMenuAction('edit')"><i class="fas fa-edit"></i> Edit Profil</button>
-    </div>
-    <div id="group-admin-only" class="hidden">
-        <button class="menu-item text-danger" onclick="handleMenuAction('delete')"><i class="fas fa-trash"></i> Hapus Data</button>
-    </div>
-    <button class="menu-item" onclick="showDetailFromMenu()"><i class="fas fa-id-card"></i> Lihat Detail</button>
-</div>
+<div class="modal fade" id="nodeModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered modal-sm"><div class="modal-content"><div class="modal-header border-0"><h6 class="fw-bold mb-0">Input Data</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body">
+    <div class="text-center mb-2"><img id="img-preview" src="" style="width:70px;height:70px;border-radius:50%;display:none;margin-bottom:8px;object-fit:cover;border:2px solid var(--secondary);"><input type="file" id="inputPhoto" class="form-control form-control-sm" accept="image/*" onchange="previewFile()"></div>
+    <input type="text" id="inputName" class="form-control form-control-sm mb-2" placeholder="Nama Lengkap">
+    <div id="extended-fields"><input type="number" id="inputPhone" class="form-control form-control-sm mb-2" placeholder="WA (628...)"><textarea id="inputBio" class="form-control form-control-sm mb-2" rows="3" placeholder="Biografi..."></textarea></div>
+    <button class="btn btn-primary w-100 fw-bold btn-sm rounded-pill" onclick="saveData()">SIMPAN DATA</button>
+</div></div></div></div>
+
+<div class="modal fade" id="userManagementModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header bg-warning border-0"><h6 class="fw-bold mb-0">Kelola Akun Login</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body p-0"><div class="p-3"><button class="btn btn-primary btn-sm rounded-pill" onclick="openUserForm('add')">Akun Baru</button></div><table class="table table-hover table-sm mb-0"><thead class="table-light"><tr><th>Username</th><th>Role</th><th>Aksi</th></tr></thead><tbody id="user-table-body"></tbody></table></div></div></div></div>
+
+<div class="modal fade" id="userFormModal" tabindex="-1"><div class="modal-dialog modal-sm modal-dialog-centered"><div class="modal-content"><div class="modal-body"><h6 class="fw-bold mb-3">Form Akun</h6><input type="hidden" id="reg-old-id"><input type="text" id="reg-username" class="form-control form-control-sm mb-2" placeholder="Username"><input type="text" id="reg-password" class="form-control form-control-sm mb-2" placeholder="Password"><select id="reg-role" class="form-select form-select-sm mb-3"><option value="administrator">Administrator</option><option value="admin">Admin</option><option value="viewer">User</option></select><button class="btn btn-primary w-100 btn-sm fw-bold rounded-pill" onclick="saveAccount()">SIMPAN AKUN</button></div></div></div></div>
+
+<div id="custom-menu"><div class="p-2 border-bottom small fw-bold text-muted">MENU AKSI</div><div id="group-staff" class="hidden"><button class="menu-item" onclick="handleMenuAction('child')"><i class="fas fa-child"></i> Tambah Anak</button><button class="menu-item" onclick="handleMenuAction('spouse')"><i class="fas fa-ring"></i> Tambah Pasangan</button><button class="menu-item" onclick="handleMenuAction('edit')"><i class="fas fa-edit"></i> Edit Profil</button></div><div id="group-admin-only" class="hidden"><button class="menu-item text-danger" onclick="handleMenuAction('delete')"><i class="fas fa-trash"></i> Hapus Data</button></div><button class="menu-item" onclick="showDetailFromMenu()"><i class="fas fa-id-card"></i> Lihat Detail</button></div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // --- ZOOM & PAN LOGIC ---
+    // === KONFIGURASI CLOUD (ISI DI SINI SEKALI SAJA) ===
+    const CLOUD_CONFIG = {
+        token: 'MASUKKAN_TOKEN_GITHUB_ANDA', // Contoh: 'ghp_xxxxxxxxx'
+        owner: 'MASUKKAN_USERNAME_GITHUB_ANDA', // Contoh: 'budi_nasab'
+        repo: 'MASUKKAN_NAMA_REPO_ANDA', // Contoh: 'database-keluarga'
+        path: 'data.json'
+    };
+    // ==================================================
+
+    // --- STATE ---
+    let familyData = JSON.parse(localStorage.getItem('nasabData')) || [{ id: "root", name: "Kepala Keluarga", parentId: null, spouse: "", bio: "Pangkal.", phone: "", photo: "" }];
+    let systemUsers = JSON.parse(localStorage.getItem('nasabUsers')) || [{ username: 'boss', pass: 'boss123', role: 'administrator' }];
+    let currentUser = null, selectedNodeId = null, currentBase64 = "", focusNodeId = null;
+
+    // --- ZOOM & PAN ENGINE ---
     let scale = 0.8, posX = 0, posY = 0;
     const viewport = document.getElementById('viewport'), wrapper = document.getElementById('tree-wrapper');
     let isDragging = false, startX, startY;
-
     viewport.addEventListener('mousedown', e => { isDragging = true; startX = e.clientX - posX; startY = e.clientY - posY; });
     window.addEventListener('mousemove', e => { if (isDragging) { posX = e.clientX - startX; posY = e.clientY - startY; updateTransform(); } });
     window.addEventListener('mouseup', () => isDragging = false);
-
     viewport.addEventListener('touchstart', e => { if(e.touches.length === 1) { isDragging = true; startX = e.touches[0].clientX - posX; startY = e.touches[0].clientY - posY; } });
     viewport.addEventListener('touchmove', e => { if(isDragging && e.touches.length === 1) { posX = e.touches[0].clientX - startX; posY = e.touches[0].clientY - startY; updateTransform(); } });
     viewport.addEventListener('touchend', () => isDragging = false);
-
     function changeZoom(d) { scale = Math.min(Math.max(0.3, scale + d), 3); updateTransform(); }
     function resetZoom() { scale = 0.8; posX = window.innerWidth / 4; posY = 100; updateTransform(); }
     function updateTransform() { wrapper.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`; }
 
-    // --- DATA ---
-    let ghConfig = JSON.parse(localStorage.getItem('ghConfig')) || { token: '', owner: '', repo: '', path: 'data.json' };
-    let familyData = JSON.parse(localStorage.getItem('nasabData')) || [{ id: "root", name: "Kepala Keluarga", parentId: null, spouse: "", bio: "Pangkal Silsilah.", phone: "", photo: "" }];
-    let systemUsers = JSON.parse(localStorage.getItem('nasabUsers')) || [
-        { username: 'boss', pass: 'boss123', role: 'administrator' },
-        { username: 'admin', pass: 'admin123', role: 'admin' },
-        { username: 'user', pass: 'user123', role: 'viewer' }
-    ];
+    // --- CLOUD ENGINE ---
+    async function syncWithCloud() {
+        if (!CLOUD_CONFIG.token || CLOUD_CONFIG.token.includes('MASUKKAN')) return;
+        document.getElementById('cloud-info').innerText = "(Syncing...)";
+        try {
+            const url = `https://api.github.com/repos/${CLOUD_CONFIG.owner}/${CLOUD_CONFIG.repo}/contents/${CLOUD_CONFIG.path}`;
+            const res = await fetch(url, { headers: { 'Authorization': `token ${CLOUD_CONFIG.token}` } });
+            if (res.ok) {
+                const d = await res.json();
+                const content = JSON.parse(decodeURIComponent(escape(atob(d.content))));
+                if(content.family) familyData = content.family;
+                if(content.users) systemUsers = content.users;
+                localStorage.setItem('nasabData', JSON.stringify(familyData));
+                localStorage.setItem('nasabUsers', JSON.stringify(systemUsers));
+                renderTree();
+                document.getElementById('cloud-info').innerText = "(Connected)";
+            }
+        } catch (e) { document.getElementById('cloud-info').innerText = "(Offline)"; }
+    }
 
-    let currentUser = null, selectedNodeId = null, currentBase64 = "", focusNodeId = null;
+    async function pushToCloud() {
+        if (!CLOUD_CONFIG.token || CLOUD_CONFIG.token.includes('MASUKKAN')) return;
+        const url = `https://api.github.com/repos/${CLOUD_CONFIG.owner}/${CLOUD_CONFIG.repo}/contents/${CLOUD_CONFIG.path}`;
+        let sha = "";
+        try {
+            const res = await fetch(url, { headers: { 'Authorization': `token ${CLOUD_CONFIG.token}` } });
+            if(res.ok) { const d = await res.json(); sha = d.sha; }
+        } catch (e) {}
+        const combined = { family: familyData, users: systemUsers };
+        const body = { message: "Cloud Update", content: btoa(unescape(encodeURIComponent(JSON.stringify(combined, null, 2)))), sha: sha };
+        await fetch(url, { method: 'PUT', headers: { 'Authorization': `token ${CLOUD_CONFIG.token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    }
 
-    // --- SYSTEM LOGIN ---
-    function login() {
+    // --- APP FLOW ---
+    async function login() {
+        await syncWithCloud(); // Tarik data terbaru sebelum login
         const u = document.getElementById('username').value, p = document.getElementById('password').value;
         const user = systemUsers.find(x => x.username === u && x.pass === p);
-        if (user) { currentUser = user; startApp(); } else { alert('Gagal Login!'); }
+        if (user) { currentUser = user; startApp(); } else { alert('Login Gagal!'); }
     }
 
     function startApp() {
@@ -292,68 +231,37 @@
         document.getElementById('main-app').classList.remove('hidden');
         document.getElementById('role-badge').innerText = currentUser.role.toUpperCase();
         if(currentUser.role === 'administrator') document.getElementById('admin-only-menu').classList.remove('hidden');
-        syncWithCloud(); goHome();
+        goHome();
     }
 
-    function logout() { location.reload(); }
     function goHome() { focusNodeId = null; document.getElementById('gen-filter').value = 'all'; renderTree(); resetZoom(); }
+    function saveAll() { localStorage.setItem('nasabData', JSON.stringify(familyData)); localStorage.setItem('nasabUsers', JSON.stringify(systemUsers)); renderTree(); pushToCloud(); }
 
-    // --- GITHUB SYNC (data.json) ---
-    async function syncWithCloud() {
-        if (!ghConfig.token || !ghConfig.owner) return;
-        document.getElementById('cloud-info').innerText = "(Sinkron...)";
-        try {
-            const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/${ghConfig.path}`;
-            const res = await fetch(url, { headers: { 'Authorization': `token ${ghConfig.token}` } });
-            if (res.ok) {
-                const d = await res.json();
-                familyData = JSON.parse(decodeURIComponent(escape(atob(d.content))));
-                localStorage.setItem('nasabData', JSON.stringify(familyData));
-                renderTree();
-                document.getElementById('cloud-info').innerText = "(Terkoneksi)";
-            }
-        } catch (e) { document.getElementById('cloud-info').innerText = "(Offline)"; }
-    }
-
-    async function pushToCloud() {
-        if (!ghConfig.token) return;
-        const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/${ghConfig.path}`;
-        let sha = "";
-        try {
-            const res = await fetch(url, { headers: { 'Authorization': `token ${ghConfig.token}` } });
-            if(res.ok) { const d = await res.json(); sha = d.sha; }
-        } catch (e) {}
-        const body = { message: "Update Data Nasab", content: btoa(unescape(encodeURIComponent(JSON.stringify(familyData, null, 2)))), sha: sha };
-        await fetch(url, { method: 'PUT', headers: { 'Authorization': `token ${ghConfig.token}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-    }
-
-    // --- TREE & GEN ---
+    // --- CORE RENDERING ---
     function updateGenFilter() {
         const select = document.getElementById('gen-filter');
         const currentVal = select.value || 'all';
-        let maxGen = 1;
-        familyData.forEach(p => { let g = getGeneration(p.id); if (g > maxGen) maxGen = g; });
+        let maxGen = 1; familyData.forEach(p => { let g = getGeneration(p.id); if (g > maxGen) maxGen = g; });
         let html = '<option value="all">Semua Gen</option>';
         for(let i=1; i<=maxGen; i++) html += `<option value="${i}">Generasi ${i}</option>`;
         select.innerHTML = html; select.value = currentVal;
     }
 
     function renderTree() {
-        const container = document.getElementById('tree-root');
-        const filterVal = document.getElementById('gen-filter').value;
+        const container = document.getElementById('tree-root'), filterVal = document.getElementById('gen-filter').value;
         updateGenFilter();
         if (focusNodeId) {
-            container.className = "tree";
             const focusRoot = familyData.find(p => p.id === focusNodeId);
             container.innerHTML = `<ul>${buildTreeHtml(focusRoot)}</ul>`;
-        } else if (filterVal === 'all') {
             container.className = "tree";
+        } else if (filterVal === 'all') {
             const root = familyData.find(p => !p.parentId);
             container.innerHTML = `<ul>${buildTreeHtml(root)}</ul>`;
+            container.className = "tree";
         } else {
-            container.className = "";
             const members = familyData.filter(p => getGeneration(p.id) === parseInt(filterVal));
             container.innerHTML = `<div class="gen-grid">${members.map(p => `<div class="person-card shadow-sm" onclick="showDetail('${p.id}')"><div class="name">${p.name}</div></div>`).join('')}</div>`;
+            container.className = "";
         }
     }
 
@@ -361,32 +269,15 @@
         if (!person) return "";
         const children = familyData.filter(c => c.parentId === person.id);
         const gen = getGeneration(person.id);
-        return `<li>
-            <div class="person-card shadow-sm" onclick="showDetail('${person.id}')" data-id="${person.id}">
-                <span class="gen-tag">Gen ${gen}</span>
-                <div class="name">${person.name}</div>
-                ${person.spouse ? `<div class="spouse"><i class="fas fa-heart"></i> ${person.spouse}</div>` : ''}
-            </div>
-            ${children.length > 0 ? `<ul>${children.map(c => buildTreeHtml(c)).join('')}</ul>` : ''}
-        </li>`;
+        return `<li><div class="person-card shadow-sm" onclick="showDetail('${person.id}')" data-id="${person.id}"><span class="gen-tag">Gen ${gen}</span><div class="name">${person.name}</div>${person.spouse ? `<div class="spouse"><i class="fas fa-heart"></i> ${person.spouse}</div>` : ''}</div>${children.length > 0 ? `<ul>${children.map(c => buildTreeHtml(c)).join('')}</ul>` : ''}</li>`;
     }
 
-    function getGeneration(id) {
-        let level = 1, curr = familyData.find(p => p.id === id);
-        while (curr && curr.parentId) { level++; curr = familyData.find(p => p.id === curr.parentId); }
-        return level;
-    }
+    function getGeneration(id) { let level = 1, curr = familyData.find(p => p.id === id); while (curr && curr.parentId) { level++; curr = familyData.find(p => p.id === curr.parentId); } return level; }
+    function getLineagePath(id) { let path = [], curr = familyData.find(p => p.id === id); while (curr) { path.push(curr.name); curr = familyData.find(p => p.id === curr.parentId); } return path.reverse().join(' >> '); }
 
-    function getLineagePath(id) {
-        let path = [], curr = familyData.find(p => p.id === id);
-        while (curr) { path.push(curr.name); curr = familyData.find(p => p.id === curr.parentId); }
-        return path.reverse().join(' >> ');
-    }
-
-    // --- UI ACTIONS ---
+    // --- ACTIONS ---
     function showDetail(id) {
-        const p = familyData.find(x => x.id === id);
-        selectedNodeId = id;
+        const p = familyData.find(x => x.id === id); selectedNodeId = id;
         document.getElementById('detName').innerText = p.name;
         document.getElementById('detSpouse').innerText = p.spouse ? "Pasangan: " + p.spouse : "";
         document.getElementById('detGen').innerText = getGeneration(id);
@@ -394,27 +285,20 @@
         document.getElementById('detImg').src = p.photo || "https://via.placeholder.com/80?text=Foto";
         document.getElementById('detBio').innerText = p.bio || "-";
         document.getElementById('detLineage').innerText = getLineagePath(id);
-        
         const contact = document.getElementById('contact-area');
-        if (p.phone) {
-            let wa = p.phone.toString(); if(wa.startsWith('0')) wa = '62' + wa.slice(1);
-            contact.innerHTML = `<a href="https://wa.me/${wa}" target="_blank" class="btn btn-success btn-sm w-100 fw-bold rounded-pill"><i class="fab fa-whatsapp me-2"></i>HUBUNGI</a>`;
-        } else { contact.innerHTML = ""; }
+        if (p.phone) { let wa = p.phone.toString(); if(wa.startsWith('0')) wa = '62' + wa.slice(1); contact.innerHTML = `<a href="https://wa.me/${wa}" target="_blank" class="btn btn-success btn-sm w-100 fw-bold rounded-pill">CHAT WA</a>`; } else { contact.innerHTML = ""; }
         new bootstrap.Modal(document.getElementById('detailModal')).show();
     }
 
     function handleMenuAction(type) {
         currentAction = type;
-        const p = familyData.find(x => x.id === selectedNodeId);
-        if (type === 'delete') { if(confirm('Hapus data ini permanen?')) { familyData = familyData.filter(x => x.id !== selectedNodeId && x.parentId !== selectedNodeId); saveNasab(); } return; }
+        if (type === 'delete') { if(confirm('Hapus?')) { familyData = familyData.filter(x => x.id !== selectedNodeId && x.parentId !== selectedNodeId); saveAll(); } return; }
         document.getElementById('extended-fields').classList.toggle('hidden', type === 'spouse');
         if (type === 'edit') {
+            const p = familyData.find(x => x.id === selectedNodeId);
             document.getElementById('inputName').value = p.name; document.getElementById('inputPhone').value = p.phone || "";
             document.getElementById('inputBio').value = p.bio || ""; currentBase64 = p.photo || "";
-        } else {
-            document.getElementById('inputName').value = ""; document.getElementById('inputPhone').value = "";
-            document.getElementById('inputBio').value = ""; currentBase64 = "";
-        }
+        } else { document.getElementById('inputName').value = ""; document.getElementById('inputPhone').value = ""; document.getElementById('inputBio').value = ""; currentBase64 = ""; }
         new bootstrap.Modal(document.getElementById('nodeModal')).show();
     }
 
@@ -427,59 +311,27 @@
         } else if (currentAction === 'child') {
             familyData.push({ id: Date.now().toString(), name: n, parentId: selectedNodeId, spouse: "", bio: bi, phone: ph, photo: currentBase64 });
         } else if (currentAction === 'spouse') familyData.find(x => x.id === selectedNodeId).spouse = n;
-        saveNasab();
-        bootstrap.Modal.getInstance(document.getElementById('nodeModal')).hide();
+        saveAll(); bootstrap.Modal.getInstance(document.getElementById('nodeModal')).hide();
     }
 
-    function saveNasab() { localStorage.setItem('nasabData', JSON.stringify(familyData)); renderTree(); pushToCloud(); }
-
-    // --- MANAJEMEN USER ---
+    // --- ACCOUNTS MGMT ---
     function openUserManagement() { renderUserTable(); new bootstrap.Modal(document.getElementById('userManagementModal')).show(); }
-    function renderUserTable() {
-        document.getElementById('user-table-body').innerHTML = systemUsers.map(u => `
-            <tr><td>${u.username}</td><td>${u.role}</td>
-            <td><button class="btn btn-xs btn-primary p-1" onclick="openUserForm('edit','${u.username}')">E</button>
-            <button class="btn btn-xs btn-danger p-1" onclick="deleteAccount('${u.username}')">X</button></td></tr>`).join('');
-    }
-    function openUserForm(mode, un='') {
-        currentAction = mode;
-        if(mode==='edit') {
-            let u = systemUsers.find(x=>x.username===un);
-            document.getElementById('reg-old-id').value = u.username; document.getElementById('reg-username').value = u.username;
-            document.getElementById('reg-password').value = u.pass; document.getElementById('reg-role').value = u.role;
-        } else {
-            document.getElementById('reg-old-id').value = ""; document.getElementById('reg-username').value = "";
-            document.getElementById('reg-password').value = ""; document.getElementById('reg-role').value = "viewer";
-        }
-        new bootstrap.Modal(document.getElementById('userFormModal')).show();
-    }
+    function renderUserTable() { document.getElementById('user-table-body').innerHTML = systemUsers.map(u => `<tr><td>${u.username}</td><td>${u.role}</td><td><button class="btn btn-xs btn-primary p-1" onclick="openUserForm('edit','${u.username}')">E</button><button class="btn btn-xs btn-danger p-1" onclick="deleteAccount('${u.username}')">X</button></td></tr>`).join(''); }
+    function openUserForm(m, un='') { currentAction = m; if(m==='edit') { let u = systemUsers.find(x=>x.username===un); document.getElementById('reg-old-id').value = u.username; document.getElementById('reg-username').value = u.username; document.getElementById('reg-password').value = u.pass; document.getElementById('reg-role').value = u.role; } else { document.getElementById('reg-old-id').value = ""; document.getElementById('reg-username').value = ""; document.getElementById('reg-password').value = ""; document.getElementById('reg-role').value = "viewer"; } new bootstrap.Modal(document.getElementById('userFormModal')).show(); }
     function saveAccount() {
         const n = document.getElementById('reg-username').value, p = document.getElementById('reg-password').value, r = document.getElementById('reg-role').value, old = document.getElementById('reg-old-id').value;
         if(!n || !p) return alert('Lengkapi data!');
         if(currentAction==='edit') { const i = systemUsers.findIndex(x=>x.username===old); systemUsers[i] = {username:n, pass:p, role:r}; }
-        else { if(systemUsers.find(x=>x.username===n)) return alert('Username sudah ada!'); systemUsers.push({username:n, pass:p, role:r}); }
-        localStorage.setItem('nasabUsers', JSON.stringify(systemUsers)); renderUserTable();
-        bootstrap.Modal.getInstance(document.getElementById('userFormModal')).hide();
+        else { if(systemUsers.find(x=>x.username===n)) return alert('Ada!'); systemUsers.push({username:n, pass:p, role:r}); }
+        saveAll(); renderUserTable(); bootstrap.Modal.getInstance(document.getElementById('userFormModal')).hide();
     }
-    function deleteAccount(un) { if(un!=='boss') { systemUsers=systemUsers.filter(x=>x.username!==un); localStorage.setItem('nasabUsers', JSON.stringify(systemUsers)); renderUserTable(); } }
+    function deleteAccount(un) { if(un!=='boss') { systemUsers=systemUsers.filter(x=>x.username!==un); saveAll(); renderUserTable(); } }
 
     // --- OTHER ---
-    function previewFile() {
-        const file = document.getElementById('inputPhoto').files[0], reader = new FileReader();
-        reader.onloadend = () => { currentBase64 = reader.result; document.getElementById('img-preview').src = reader.result; document.getElementById('img-preview').style.display = "inline-block"; }
-        if (file) reader.readAsDataURL(file);
-    }
-    function saveGhConfig() {
-        ghConfig.token = document.getElementById('gh-token').value; ghConfig.owner = document.getElementById('gh-owner').value;
-        ghConfig.repo = document.getElementById('gh-repo').value; localStorage.setItem('ghConfig', JSON.stringify(ghConfig));
-        bootstrap.Modal.getInstance(document.getElementById('ghSettingsModal')).hide(); syncWithCloud();
-    }
-    function openGhSettings() {
-        document.getElementById('gh-token').value = ghConfig.token; document.getElementById('gh-owner').value = ghConfig.owner;
-        document.getElementById('gh-repo').value = ghConfig.repo; new bootstrap.Modal(document.getElementById('ghSettingsModal')).show();
-    }
+    function previewFile() { const file = document.getElementById('inputPhoto').files[0], reader = new FileReader(); reader.onloadend = () => { currentBase64 = reader.result; document.getElementById('img-preview').src = reader.result; document.getElementById('img-preview').style.display = "inline-block"; }; if (file) reader.readAsDataURL(file); }
     function setFocusTree() { focusNodeId = selectedNodeId; bootstrap.Modal.getInstance(document.getElementById('detailModal')).hide(); renderTree(); resetZoom(); }
     function resetFocusAndRender() { focusNodeId = null; renderTree(); }
+    function logout() { location.reload(); }
     function showDetailFromMenu() { showDetail(selectedNodeId); }
 
     const menu = document.getElementById('custom-menu');
