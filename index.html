@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nasab Pro - Enterprise Edition</title>
+    <title>Nasab Pro - Enterprise Cloud Edition</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -35,7 +35,7 @@
         .person-card {
             border: 2px solid #dee2e6; padding: 12px; display: inline-block; border-radius: 12px;
             background-color: white; min-width: 150px; box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            cursor: pointer; transition: 0.2s; user-select: none; -webkit-user-select: none;
+            cursor: pointer; transition: 0.2s; user-select: none;
         }
         .person-card:hover { transform: translateY(-5px); border-color: var(--secondary); }
         .person-card .name { font-weight: bold; color: var(--primary); font-size: 1rem; }
@@ -68,6 +68,7 @@
         #img-preview { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; display: none; margin-bottom: 10px; border: 2px solid var(--secondary); }
 
         .hidden { display: none !important; }
+        .sync-status { font-size: 0.7rem; color: #2ecc71; margin-left: 10px; }
     </style>
 </head>
 <body>
@@ -79,27 +80,44 @@
             <div class="bg-primary text-white d-inline-block p-3 rounded-circle mb-2"><i class="fas fa-key fa-2x"></i></div>
             <h4 class="fw-bold">Login Nasab</h4>
         </div>
-        <div class="mb-3"><label class="form-label">Username</label><input type="text" id="username" class="form-control"></div>
-        <div class="mb-3"><label class="form-label">Password</label><input type="password" id="password" class="form-control"></div>
+        <div class="mb-3"><label class="form-label">Username</label><input type="text" id="username" class="form-control" value="boss"></div>
+        <div class="mb-3"><label class="form-label">Password</label><input type="password" id="password" class="form-control" value="boss123"></div>
         <button class="btn btn-primary w-100 py-2 fw-bold" onclick="login()">MASUK</button>
-        <div class="mt-3 text-center small text-muted">Akses Default: jangan pernah melupakan sejarah dan leluhurmu!</div>
     </div>
 </div>
 
 <!-- APLIKASI UTAMA -->
 <div id="main-app" class="hidden">
     <nav class="navbar navbar-dark bg-dark sticky-top px-3 shadow">
-        <span class="navbar-brand mb-0 h1"><i class="fas fa-sitemap me-2 text-success"></i>NasabApp</span>
+        <span class="navbar-brand mb-0 h1"><i class="fas fa-sitemap me-2 text-success"></i>NasabCloud <span id="cloud-info" class="sync-status"></span></span>
         <div class="d-flex align-items-center">
-            <!-- Tombol Kelola User (Hanya Administrator) -->
-            <button id="btn-manage-users" class="btn btn-warning btn-sm me-2 hidden" onclick="openUserManagement()">
-                <i class="fas fa-users-cog"></i> Akun
-            </button>
+            <button class="btn btn-outline-success btn-sm me-2" title="Sync Cloud" onclick="syncWithCloud()"><i class="fas fa-cloud-download-alt"></i></button>
+            <button class="btn btn-outline-secondary btn-sm me-2" title="Settings" onclick="openGhSettings()"><i class="fas fa-cog"></i></button>
+            <button id="btn-manage-users" class="btn btn-warning btn-sm me-2 hidden" onclick="openUserManagement()"><i class="fas fa-users-cog"></i></button>
             <span id="role-badge" class="badge bg-primary me-2"></span>
             <button class="btn btn-outline-light btn-sm" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
         </div>
     </nav>
     <div class="tree-container"><div class="tree" id="tree-root"></div></div>
+</div>
+
+<!-- MODAL GITHUB SETTINGS -->
+<div class="modal fade" id="ghSettingsModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-dark text-white border-0">
+                <h5 class="modal-title fw-bold"><i class="fab fa-github me-2"></i>GitHub Cloud Sync</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning small">Data disimpan di file <b>data.json</b> pada repositori Anda.</div>
+                <div class="mb-2"><label class="small fw-bold">GitHub Token</label><input type="password" id="gh-token" class="form-control shadow-sm" placeholder="ghp_xxxx"></div>
+                <div class="mb-2"><label class="small fw-bold">GitHub Username</label><input type="text" id="gh-owner" class="form-control shadow-sm" placeholder="username"></div>
+                <div class="mb-2"><label class="small fw-bold">Repository Name</label><input type="text" id="gh-repo" class="form-control shadow-sm" placeholder="nasab-data"></div>
+                <button class="btn btn-primary w-100 mt-3 fw-bold" onclick="saveGhConfig()">SIMPAN & HUBUNGKAN</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- CONTEXT MENU KLIK KANAN -->
@@ -119,47 +137,20 @@
     <button class="menu-item" onclick="showDetailFromMenu()"><i class="fas fa-info-circle"></i> Detail Lengkap</button>
 </div>
 
-<!-- MODAL MANAJEMEN USER (KHUSUS ADMINISTRATOR) -->
+<!-- MODAL MANAJEMEN USER -->
 <div class="modal fade" id="userManagementModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-warning border-0">
-                <h5 class="modal-title fw-bold"><i class="fas fa-users-cog me-2"></i>Kelola Akun Login</h5>
+                <h5 class="modal-title fw-bold"><i class="fas fa-users-cog me-2"></i>Kelola Akun</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <button class="btn btn-primary btn-sm mb-3" onclick="openUserForm('add')"><i class="fas fa-plus me-1"></i> Buat Akun Baru</button>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr><th>Username</th><th>Level</th><th>Password</th><th>Aksi</th></tr>
-                        </thead>
-                        <tbody id="user-table-body"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL FORM USER (ADD/EDIT) -->
-<div class="modal fade" id="userFormModal" tabindex="-1">
-    <div class="modal-dialog modal-sm modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header border-0 shadow-sm"><h6 class="fw-bold mb-0">Form Akun</h6></div>
-            <div class="modal-body">
-                <input type="hidden" id="user-old-username">
-                <div class="mb-2"><label class="small fw-bold">Username</label><input type="text" id="user-name" class="form-control"></div>
-                <div class="mb-2"><label class="small fw-bold">Password</label><input type="text" id="user-pass" class="form-control"></div>
-                <div class="mb-3">
-                    <label class="small fw-bold">Level Akses</label>
-                    <select id="user-role" class="form-select">
-                        <option value="administrator">Administrator (Full)</option>
-                        <option value="admin">Admin (Tambah Saja)</option>
-                        <option value="viewer">User (Lihat Saja)</option>
-                    </select>
-                </div>
-                <button class="btn btn-primary w-100 fw-bold" onclick="saveAccount()">SIMPAN AKUN</button>
+                <table class="table table-hover align-middle">
+                    <thead><tr><th>User</th><th>Role</th><th>Pass</th><th>Aksi</th></tr></thead>
+                    <tbody id="user-table-body"></tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -169,8 +160,8 @@
 <div class="modal fade" id="detailModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-            <div class="modal-header bg-primary text-white border-0" style="border-radius: 20px 20px 0 0;">
-                <h5 class="modal-title"><i class="fas fa-id-card me-2"></i>Informasi Profil</h5>
+            <div class="modal-header bg-primary text-white border-0">
+                <h5 class="modal-title"><i class="fas fa-id-card me-2"></i>Profil</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body text-center p-4">
@@ -178,14 +169,13 @@
                 <h3 id="detName" class="fw-bold mb-1"></h3>
                 <p id="detSpouse" class="text-danger small fw-bold mb-4"></p>
                 <div class="row g-2 mb-3">
-                    <div class="col-4"><div class="stat-box"><span class="stat-label">Gen</span><span id="detGen" class="stat-value text-primary"></span></div></div>
-                    <div class="col-4"><div class="stat-box"><span class="stat-label">Saudara</span><span id="detSiblings" class="stat-value text-success"></span></div></div>
-                    <div class="col-4"><div class="stat-box"><span class="stat-label">Anak</span><span id="detChildren" class="stat-value text-info"></span></div></div>
+                    <div class="col-4"><div class="stat-box"><span class="stat-label">Gen</span><span id="detGen" class="stat-value"></span></div></div>
+                    <div class="col-4"><div class="stat-box"><span class="stat-label">Saudara</span><span id="detSiblings" class="stat-value"></span></div></div>
+                    <div class="col-4"><div class="stat-box"><span class="stat-label">Anak</span><span id="detChildren" class="stat-value"></span></div></div>
                 </div>
-                <div class="info-section"><span class="info-title">Biografi Singkat</span><div id="detBio" style="font-size: 0.9rem; text-align: left;"></div></div>
-                <div id="detAddrBox" class="info-section hidden"><span class="info-title">Alamat</span><div id="detAddress" style="font-size: 0.9rem; text-align: left;"></div></div>
+                <div class="info-section"><span class="info-title">Biografi</span><div id="detBio"></div></div>
                 <div id="contact-area"></div>
-                <div class="lineage-path"><small class="text-muted d-block mb-1 fst-italic">Jalur Nasab:</small><div id="detPath"></div></div>
+                <div class="lineage-path"><small class="text-muted d-block">Jalur Nasab:</small><div id="detPath"></div></div>
             </div>
         </div>
     </div>
@@ -201,14 +191,14 @@
                     <img id="img-preview" src="">
                     <input type="file" id="inputPhoto" class="form-control form-control-sm" accept="image/*" onchange="previewFile()">
                 </div>
-                <div class="mb-3"><label class="form-label">Nama Lengkap</label><input type="text" id="inputName" class="form-control shadow-sm"></div>
+                <div class="mb-3"><label class="form-label">Nama Lengkap</label><input type="text" id="inputName" class="form-control"></div>
                 <div id="extended-fields">
-                    <div class="mb-3"><label class="form-label">No. WA</label><input type="number" id="inputPhone" class="form-control shadow-sm"></div>
-                    <div class="mb-3"><label class="form-label">Alamat</label><input type="text" id="inputAddress" class="form-control shadow-sm"></div>
-                    <div class="mb-3"><label class="form-label">Biografi</label><textarea id="inputBio" class="form-control shadow-sm" rows="3"></textarea></div>
+                    <div class="mb-3"><label class="form-label">No. WA</label><input type="number" id="inputPhone" class="form-control"></div>
+                    <div class="mb-3"><label class="form-label">Alamat</label><input type="text" id="inputAddress" class="form-control"></div>
+                    <div class="mb-3"><label class="form-label">Biografi</label><textarea id="inputBio" class="form-control" rows="3"></textarea></div>
                 </div>
             </div>
-            <div class="modal-footer border-0"><button type="button" class="btn btn-primary w-100 fw-bold" onclick="saveData()">SIMPAN DATA NASAB</button></div>
+            <div class="modal-footer border-0"><button type="button" class="btn btn-primary w-100 fw-bold" onclick="saveData()">SIMPAN</button></div>
         </div>
     </div>
 </div>
@@ -216,15 +206,15 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // SISTEM PENGGUNA (User Management)
-    let systemUsers = JSON.parse(localStorage.getItem('nasabUsers')) || [
-        { username: 'boss', pass: 'boss123', role: 'administrator' },
-        { username: 'admin', pass: 'admin123', role: 'admin' },
-        { username: 'user', pass: 'user123', role: 'viewer' }
+    // --- KONFIGURASI AWAL ---
+    let ghConfig = JSON.parse(localStorage.getItem('ghConfig')) || { token: '', owner: '', repo: '', path: 'data.json' };
+    
+    let familyData = JSON.parse(localStorage.getItem('nasabData')) || [
+        { id: "root", name: "Kepala Keluarga", parentId: null, spouse: "", bio: "Pangkal Nasab.", phone: "", address: "", photo: "" }
     ];
 
-    let familyData = JSON.parse(localStorage.getItem('nasabData')) || [
-        { id: "root", name: "Kepala Keluarga Besar", parentId: null, spouse: "", bio: "Pangkal Nasab.", phone: "", address: "", photo: "" }
+    let systemUsers = JSON.parse(localStorage.getItem('nasabUsers')) || [
+        { username: 'boss', pass: 'boss123', role: 'administrator' }
     ];
 
     let currentUser = null;
@@ -232,14 +222,71 @@
     let currentAction = "";
     let currentBase64 = "";
 
+    // --- FUNGSI CLOUD SYNC (GITHUB) ---
+    async function syncWithCloud() {
+        if (!ghConfig.token || !ghConfig.owner || !ghConfig.repo) return;
+        document.getElementById('cloud-info').innerText = "Syncing...";
+        
+        const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/${ghConfig.path}`;
+        try {
+            const res = await fetch(url, { headers: { 'Authorization': `token ${ghConfig.token}` } });
+            if (res.ok) {
+                const data = await res.json();
+                const content = decodeURIComponent(escape(atob(data.content)));
+                familyData = JSON.parse(content);
+                localStorage.setItem('nasabData', JSON.stringify(familyData));
+                renderTree();
+                document.getElementById('cloud-info').innerText = "Cloud Connected";
+            } else {
+                document.getElementById('cloud-info').innerText = "Cloud Error";
+            }
+        } catch (e) { document.getElementById('cloud-info').innerText = "Offline"; }
+    }
+
+    async function pushToCloud() {
+        if (!ghConfig.token || !ghConfig.owner || !ghConfig.repo) return;
+        const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/${ghConfig.path}`;
+        
+        let sha = "";
+        try {
+            const res = await fetch(url, { headers: { 'Authorization': `token ${ghConfig.token}` } });
+            if(res.ok) { const d = await res.json(); sha = d.sha; }
+        } catch (e) {}
+
+        const content = btoa(unescape(encodeURIComponent(JSON.stringify(familyData, null, 2))));
+        const body = { message: "Update Data Nasab", content: content, sha: sha };
+
+        await fetch(url, {
+            method: 'PUT',
+            headers: { 'Authorization': `token ${ghConfig.token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+    }
+
+    function openGhSettings() {
+        document.getElementById('gh-token').value = ghConfig.token;
+        document.getElementById('gh-owner').value = ghConfig.owner;
+        document.getElementById('gh-repo').value = ghConfig.repo;
+        new bootstrap.Modal(document.getElementById('ghSettingsModal')).show();
+    }
+
+    function saveGhConfig() {
+        ghConfig.token = document.getElementById('gh-token').value;
+        ghConfig.owner = document.getElementById('gh-owner').value;
+        ghConfig.repo = document.getElementById('gh-repo').value;
+        localStorage.setItem('ghConfig', JSON.stringify(ghConfig));
+        alert('Pengaturan Cloud Disimpan!');
+        bootstrap.Modal.getInstance(document.getElementById('ghSettingsModal')).hide();
+        syncWithCloud();
+    }
+
+    // --- CORE APP LOGIC ---
     function login() {
         const u = document.getElementById('username').value;
         const p = document.getElementById('password').value;
         const user = systemUsers.find(x => x.username === u && x.pass === p);
-        if (user) { currentUser = user; startApp(); } else { alert('Gagal! Periksa kembali Username/Password.'); }
+        if (user) { currentUser = user; startApp(); } else { alert('Gagal!'); }
     }
-
-    function logout() { location.reload(); }
 
     function startApp() {
         document.getElementById('login-page').classList.add('hidden');
@@ -247,91 +294,10 @@
         document.getElementById('role-badge').innerText = currentUser.role.toUpperCase();
         if(currentUser.role === 'administrator') document.getElementById('btn-manage-users').classList.remove('hidden');
         renderTree();
+        syncWithCloud();
     }
 
-    // MANAJEMEN AKUN LOGIN
-    function openUserManagement() {
-        renderUserTable();
-        new bootstrap.Modal(document.getElementById('userManagementModal')).show();
-    }
-
-    function renderUserTable() {
-        const tbody = document.getElementById('user-table-body');
-        tbody.innerHTML = systemUsers.map(u => `
-            <tr>
-                <td><b>${u.username}</b></td>
-                <td><span class="badge bg-info">${u.role}</span></td>
-                <td><code>${u.pass}</code></td>
-                <td>
-                    <button class="btn btn-sm btn-outline-primary" onclick="openUserForm('edit', '${u.username}')"><i class="fas fa-edit"></i></button>
-                    ${u.username !== 'boss' ? `<button class="btn btn-sm btn-outline-danger" onclick="deleteAccount('${u.username}')"><i class="fas fa-trash"></i></button>` : ''}
-                </td>
-            </tr>
-        `).join('');
-    }
-
-    function openUserForm(mode, username = '') {
-        currentAction = mode;
-        if(mode === 'edit') {
-            const u = systemUsers.find(x => x.username === username);
-            document.getElementById('user-old-username').value = u.username;
-            document.getElementById('user-name').value = u.username;
-            document.getElementById('user-pass').value = u.pass;
-            document.getElementById('user-role').value = u.role;
-        } else {
-            document.getElementById('user-name').value = "";
-            document.getElementById('user-pass').value = "";
-            document.getElementById('user-role').value = "viewer";
-        }
-        new bootstrap.Modal(document.getElementById('userFormModal')).show();
-    }
-
-    function saveAccount() {
-        const name = document.getElementById('user-name').value;
-        const pass = document.getElementById('user-pass').value;
-        const role = document.getElementById('user-role').value;
-        const oldName = document.getElementById('user-old-username').value;
-
-        if(!name || !pass) return alert('Wajib diisi!');
-
-        if(currentAction === 'edit') {
-            const idx = systemUsers.findIndex(x => x.username === oldName);
-            systemUsers[idx] = { username: name, pass: pass, role: role };
-        } else {
-            if(systemUsers.find(x => x.username === name)) return alert('Username sudah ada!');
-            systemUsers.push({ username: name, pass: pass, role: role });
-        }
-        
-        localStorage.setItem('nasabUsers', JSON.stringify(systemUsers));
-        renderUserTable();
-        bootstrap.Modal.getInstance(document.getElementById('userFormModal')).hide();
-    }
-
-    function deleteAccount(username) {
-        if(confirm('Hapus akun ini?')) {
-            systemUsers = systemUsers.filter(x => x.username !== username);
-            localStorage.setItem('nasabUsers', JSON.stringify(systemUsers));
-            renderUserTable();
-        }
-    }
-
-    // MANAJEMEN DATA NASAB
-    function previewFile() {
-        const file = document.getElementById('inputPhoto').files[0];
-        const reader = new FileReader();
-        reader.onloadend = () => { 
-            currentBase64 = reader.result; 
-            document.getElementById('img-preview').src = reader.result; 
-            document.getElementById('img-preview').style.display = "inline-block"; 
-        }
-        if (file) reader.readAsDataURL(file);
-    }
-
-    function getGeneration(id) {
-        let level = 1; let curr = familyData.find(p => p.id === id);
-        while (curr && curr.parentId) { level++; curr = familyData.find(p => p.id === curr.parentId); }
-        return level;
-    }
+    function logout() { location.reload(); }
 
     function renderTree() {
         const root = familyData.find(p => !p.parentId);
@@ -346,76 +312,22 @@
             <div class="person-card shadow-sm" onclick="showDetail('${person.id}')" data-id="${person.id}">
                 <span class="gen-tag">Gen ${gen}</span>
                 <div class="name">${person.name}</div>
-                ${person.spouse ? `<div class="spouse"><i class="fas fa-heart text-danger"></i> ${person.spouse}</div>` : ''}
+                ${person.spouse ? `<div class="spouse"><i class="fas fa-heart"></i> ${person.spouse}</div>` : ''}
             </div>
             ${children.length > 0 ? `<ul>${children.map(c => buildHtml(c)).join('')}</ul>` : ''}
         </li>`;
     }
 
-    function showDetail(id) {
-        const p = familyData.find(x => x.id === id);
-        selectedNodeId = id;
-        document.getElementById('detName').innerText = p.name;
-        document.getElementById('detSpouse').innerText = p.spouse ? "Pasangan: " + p.spouse : "";
-        document.getElementById('detGen').innerText = getGeneration(id);
-        document.getElementById('detSiblings').innerText = p.parentId ? familyData.filter(x => x.parentId === p.parentId).length - 1 : 0;
-        document.getElementById('detChildren').innerText = familyData.filter(x => x.parentId === id).length;
-        document.getElementById('detImg').src = p.photo || "https://via.placeholder.com/110?text=Foto";
-        document.getElementById('detBio').innerText = p.bio || "-";
-        
-        const addrBox = document.getElementById('detAddrBox');
-        if(p.address) { document.getElementById('detAddress').innerText = p.address; addrBox.classList.remove('hidden'); } else { addrBox.classList.add('hidden'); }
-
-        const contactArea = document.getElementById('contact-area');
-        if (p.phone) {
-            let waNum = p.phone.toString(); if(waNum.startsWith('0')) waNum = '62' + waNum.slice(1);
-            contactArea.innerHTML = `<a href="https://wa.me/${waNum}" target="_blank" class="btn-wa shadow-sm"><i class="fab fa-whatsapp me-2"></i>Hubungi Keluarga</a>`;
-        } else { contactArea.innerHTML = ""; }
-
-        const path = []; let c = p;
-        while(c) { path.push(c.name); c = familyData.find(x => x.id === c.parentId); }
-        document.getElementById('detPath').innerHTML = path.reverse().map(n => `<span class="path-item">${n}</span>`).join('<i class="fas fa-chevron-right px-1 small text-muted"></i>');
-        new bootstrap.Modal(document.getElementById('detailModal')).show();
+    function getGeneration(id) {
+        let level = 1; let curr = familyData.find(p => p.id === id);
+        while (curr && curr.parentId) { level++; curr = familyData.find(p => p.id === curr.parentId); }
+        return level;
     }
 
-    function showDetailFromMenu() { showDetail(selectedNodeId); menu.style.display = 'none'; }
-
-    const menu = document.getElementById('custom-menu');
-    window.addEventListener('contextmenu', e => {
-        const card = e.target.closest('.person-card');
-        if (card) { 
-            e.preventDefault(); selectedNodeId = card.getAttribute('data-id');
-            const role = currentUser.role;
-            document.getElementById('role-admin-only').classList.toggle('hidden', role !== 'administrator');
-            document.getElementById('role-delete-only').classList.toggle('hidden', role !== 'administrator');
-            document.getElementById('role-staff-access').classList.toggle('hidden', role === 'viewer');
-            menu.style.display = 'block'; menu.style.left = e.pageX + 'px'; menu.style.top = e.pageY + 'px'; 
-        } else { menu.style.display = 'none'; }
-    });
-    window.addEventListener('click', () => menu.style.display = 'none');
-
-    function handleMenuAction(type) {
-        currentAction = type;
-        const p = familyData.find(x => x.id === selectedNodeId);
-        if (type === 'delete') { if(confirm('Hapus Anggota Nasab ini?')) { familyData = familyData.filter(x => x.id !== selectedNodeId && x.parentId !== selectedNodeId); saveNasab(); } return; }
-        
-        document.getElementById('photo-field').classList.toggle('hidden', type === 'spouse');
-        document.getElementById('extended-fields').classList.toggle('hidden', type === 'spouse');
-        const preview = document.getElementById('img-preview');
-        
-        if (type === 'edit') {
-            document.getElementById('inputName').value = p.name;
-            document.getElementById('inputPhone').value = p.phone || "";
-            document.getElementById('inputAddress').value = p.address || "";
-            document.getElementById('inputBio').value = p.bio || "";
-            currentBase64 = p.photo || "";
-            if(p.photo) { preview.src = p.photo; preview.style.display = "inline-block"; } else { preview.style.display = "none"; }
-        } else {
-            document.getElementById('inputName').value = (type === 'spouse') ? p.spouse : ""; 
-            document.getElementById('inputPhone').value = ""; document.getElementById('inputAddress').value = "";
-            document.getElementById('inputBio').value = ""; currentBase64 = ""; preview.style.display = "none";
-        }
-        new bootstrap.Modal(document.getElementById('nodeModal')).show();
+    function saveNasab() {
+        localStorage.setItem('nasabData', JSON.stringify(familyData));
+        renderTree();
+        pushToCloud();
     }
 
     function saveData() {
@@ -436,7 +348,80 @@
         bootstrap.Modal.getInstance(document.getElementById('nodeModal')).hide();
     }
 
-    function saveNasab() { localStorage.setItem('nasabData', JSON.stringify(familyData)); renderTree(); }
+    // --- UI EVENT HANDLERS ---
+    function showDetail(id) {
+        const p = familyData.find(x => x.id === id);
+        selectedNodeId = id;
+        document.getElementById('detName').innerText = p.name;
+        document.getElementById('detSpouse').innerText = p.spouse ? "Pasangan: " + p.spouse : "";
+        document.getElementById('detGen').innerText = getGeneration(id);
+        document.getElementById('detSiblings').innerText = p.parentId ? familyData.filter(x => x.parentId === p.parentId).length - 1 : 0;
+        document.getElementById('detChildren').innerText = familyData.filter(x => x.parentId === id).length;
+        document.getElementById('detImg').src = p.photo || "https://via.placeholder.com/110?text=Foto";
+        document.getElementById('detBio').innerText = p.bio || "-";
+        
+        const contactArea = document.getElementById('contact-area');
+        if (p.phone) {
+            let waNum = p.phone.toString(); if(waNum.startsWith('0')) waNum = '62' + waNum.slice(1);
+            contactArea.innerHTML = `<a href="https://wa.me/${waNum}" target="_blank" class="btn-wa shadow-sm"><i class="fab fa-whatsapp me-2"></i>WA Keluarga</a>`;
+        } else { contactArea.innerHTML = ""; }
+
+        const path = []; let c = p;
+        while(c) { path.push(c.name); c = familyData.find(x => x.id === c.parentId); }
+        document.getElementById('detPath').innerHTML = path.reverse().map(n => `<span class="path-item">${n}</span>`).join(' > ');
+        new bootstrap.Modal(document.getElementById('detailModal')).show();
+    }
+
+    const menu = document.getElementById('custom-menu');
+    window.addEventListener('contextmenu', e => {
+        const card = e.target.closest('.person-card');
+        if (card) { 
+            e.preventDefault(); selectedNodeId = card.getAttribute('data-id');
+            const r = currentUser.role;
+            document.getElementById('role-admin-only').classList.toggle('hidden', r !== 'administrator');
+            document.getElementById('role-delete-only').classList.toggle('hidden', r !== 'administrator');
+            document.getElementById('role-staff-access').classList.toggle('hidden', r === 'viewer');
+            menu.style.display = 'block'; menu.style.left = e.pageX + 'px'; menu.style.top = e.pageY + 'px'; 
+        } else { menu.style.display = 'none'; }
+    });
+    window.addEventListener('click', () => menu.style.display = 'none');
+
+    function handleMenuAction(type) {
+        currentAction = type;
+        const p = familyData.find(x => x.id === selectedNodeId);
+        if (type === 'delete') { if(confirm('Hapus?')) { familyData = familyData.filter(x => x.id !== selectedNodeId && x.parentId !== selectedNodeId); saveNasab(); } return; }
+        
+        document.getElementById('photo-field').classList.toggle('hidden', type === 'spouse');
+        document.getElementById('extended-fields').classList.toggle('hidden', type === 'spouse');
+        const preview = document.getElementById('img-preview');
+        
+        if (type === 'edit') {
+            document.getElementById('inputName').value = p.name;
+            document.getElementById('inputPhone').value = p.phone || "";
+            document.getElementById('inputAddress').value = p.address || "";
+            document.getElementById('inputBio').value = p.bio || "";
+            currentBase64 = p.photo || "";
+            if(p.photo) { preview.src = p.photo; preview.style.display = "inline-block"; } else { preview.style.display = "none"; }
+        } else {
+            document.getElementById('inputName').value = (type === 'spouse') ? p.spouse : ""; 
+            document.getElementById('inputPhone').value = ""; document.getElementById('inputAddress').value = "";
+            document.getElementById('inputBio').value = ""; currentBase64 = ""; preview.style.display = "none";
+        }
+        new bootstrap.Modal(document.getElementById('nodeModal')).show();
+    }
+
+    function previewFile() {
+        const file = document.getElementById('inputPhoto').files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => { 
+            currentBase64 = reader.result; 
+            document.getElementById('img-preview').src = reader.result; 
+            document.getElementById('img-preview').style.display = "inline-block"; 
+        }
+        if (file) reader.readAsDataURL(file);
+    }
+    
+    function showDetailFromMenu() { showDetail(selectedNodeId); }
 </script>
 </body>
 </html>
