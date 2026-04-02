@@ -2,472 +2,242 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <title>Nasab Pro - Multi Project Edition</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Silsilah Keluarga - Nasab Digital</title>
+    
+    <!-- Library CSS & JS -->
+    <script src="https://balkangraph.com/js/orgchart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
     <style>
-        :root { --primary: #2c3e50; --secondary: #27ae60; --accent: #e67e22; --wa: #25d366; --bg: #f4f7f6; }
-        body { background-color: var(--bg); font-family: 'Segoe UI', sans-serif; margin: 0; overflow: hidden; }
-
-        /* LOGIN PAGE */
-        #login-page {
-            height: 100vh; display: flex; align-items: center; justify-content: center;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            position: fixed; width: 100%; z-index: 3000;
+        :root { --primary-blue: #1e40af; }
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #f1f5f9; }
+        #tree { width: 100%; height: calc(100vh - 64px); }
+        
+        /* Custom UI Responsif */
+        .node-menu {
+            display: none; position: absolute; background: white; 
+            border-radius: 8px; shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            z-index: 1000; width: 200px; border: 1px solid #e2e8f0;
         }
-
-        /* CONTAINER POHON */
-        .tree-container { 
-            overflow: auto; 
-            width: 100vw; 
-            height: calc(100vh - 56px); 
-            background-color: white; 
-            cursor: grab;
-            position: relative;
+        .menu-item {
+            padding: 12px 16px; cursor: pointer; display: flex; align-items: center;
+            gap: 10px; color: #334155; transition: 0.2s;
         }
-
-        .tree-wrapper {
-            padding: 150px; 
-            display: inline-block;
-            min-width: 100%;
-            transform-origin: center center;
-            transition: transform 0.2s ease;
-        }
-
-        /* Garis Pohon */
-        .tree ul { padding-top: 20px; position: relative; display: flex; justify-content: center; padding-left: 0; }
-        .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 5px 0 5px; }
-        .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #adb5bd; width: 50%; height: 20px; }
-        .tree li::after { right: auto; left: 50%; border-left: 2px solid #adb5bd; }
-        .tree li:only-child::after, .tree li:only-child::before { display: none; }
-        .tree li:only-child { padding-top: 0; }
-        .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
-        .tree li:last-child::before { border-right: 2px solid #adb5bd; border-radius: 0 5px 0 0; }
-        .tree li:first-child::after { border-radius: 5px 0 0 0; }
-        .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #adb5bd; width: 0; height: 20px; }
-
-        /* Kartu Anggota */
-        .person-card {
-            border: 2px solid #dee2e6; padding: 10px; display: inline-block; border-radius: 12px;
-            background-color: white; min-width: 140px; box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            cursor: pointer; transition: 0.2s; user-select: none;
-        }
-        .person-card:hover { border-color: var(--secondary); background: #f9f9f9; }
-        .person-card .name { font-weight: bold; color: var(--primary); font-size: 0.9rem; }
-        .person-card .spouse { font-size: 0.75rem; color: #e74c3c; border-top: 1px dashed #eee; margin-top: 5px; }
-        .gen-tag { background: var(--accent); color: white; padding: 1px 6px; border-radius: 8px; font-size: 0.6rem; margin-bottom: 4px; display: inline-block; }
-
-        /* CONTROLS ZOOM */
-        .zoom-controls { position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; }
-        .zoom-btn { width: 45px; height: 45px; border-radius: 50%; background: white; border: 1px solid #ccc; box-shadow: 0 2px 10px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; color: var(--primary); cursor: pointer; }
-
-        /* Navbar Custom */
-        .project-selector { max-width: 150px; background: #343a40; color: white; border: 1px solid #495057; font-size: 0.85rem; border-radius: 5px; padding: 2px 5px; }
-
-        /* Context Menu */
-        #custom-menu { position: absolute; display: none; z-index: 4000; background: white; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); min-width: 180px; overflow: hidden; }
-        .menu-item { padding: 12px 15px; cursor: pointer; display: flex; align-items: center; font-size: 0.9rem; color: #333; border: none; width: 100%; background: none; text-align: left; }
-        .menu-item i { width: 25px; color: var(--primary); }
-        .menu-item:hover { background-color: #f1f3f5; }
-
-        /* Profile Detail */
-        .profile-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 15px; }
-        .btn-wa { background-color: var(--wa); color: white; border-radius: 10px; font-weight: bold; padding: 10px; text-decoration: none; display: block; margin-top: 15px; text-align: center; }
-
-        .hidden { display: none !important; }
+        .menu-item:hover { background: #eff6ff; color: #1e40af; }
+        .menu-item.danger { color: #ef4444; }
+        .menu-item.danger:hover { background: #fef2f2; }
     </style>
 </head>
 <body>
 
-<!-- HALAMAN LOGIN -->
-<div id="login-page">
-    <div class="card p-4 shadow-lg border-0" style="width: 320px; border-radius: 20px;">
-        <div class="text-center mb-4">
-            <div class="bg-primary text-white d-inline-block p-3 rounded-circle mb-2"><i class="fas fa-key fa-2x"></i></div>
-            <h4 class="fw-bold">Login Nasab</h4>
+    <!-- Header -->
+    <nav class="bg-blue-800 h-16 flex items-center justify-between px-6 text-white shadow-lg">
+        <div class="flex items-center gap-2">
+            <i class="fas fa-sitemap text-xl text-blue-300"></i>
+            <h1 class="font-bold text-lg tracking-tight">NasabKeluarga</h1>
         </div>
-        <div class="mb-3"><label class="form-label">Username</label><input type="text" id="username" class="form-control" placeholder="boss / admin / user"></div>
-        <div class="mb-3"><label class="form-label">Password</label><input type="password" id="password" class="form-control"></div>
-        <button class="btn btn-primary w-100 py-2 fw-bold" onclick="login()">MASUK</button>
-    </div>
-</div>
-
-<!-- APLIKASI UTAMA -->
-<div id="main-app" class="hidden">
-    <nav class="navbar navbar-dark bg-dark sticky-top px-2 shadow">
-        <div class="d-flex align-items-center">
-            <span class="navbar-brand mb-0 h1 me-2" style="font-size: 1rem;"><i class="fas fa-sitemap text-success"></i></span>
-            <!-- Dropdown Pilih Silsilah -->
-            <select id="active-project-select" class="project-selector" onchange="switchProject(this.value)"></select>
-        </div>
-        
-        <div class="d-flex align-items-center">
-            <!-- Menu Khusus Administrator -->
-            <div id="admin-tools" class="hidden">
-                <button class="btn btn-outline-info btn-sm me-1" onclick="openProjectManagement()" title="Kelola Silsilah"><i class="fas fa-folder-plus"></i></button>
-                <button class="btn btn-outline-warning btn-sm me-1" onclick="openUserManagement()" title="Kelola Akun"><i class="fas fa-users-cog"></i></button>
+        <div class="flex items-center gap-4">
+            <div class="text-right">
+                <p id="displayUser" class="text-xs font-bold">Tamu (Viewer)</p>
+                <p id="displayRole" class="text-[10px] text-blue-200 uppercase">Read Only</p>
             </div>
-            <button class="btn btn-outline-light btn-sm" onclick="logout()"><i class="fas fa-power-off"></i></button>
+            <button onclick="toggleLoginModal()" class="bg-blue-600 p-2 rounded-full hover:bg-blue-500 transition">
+                <i class="fas fa-user-lock"></i>
+            </button>
         </div>
     </nav>
 
-    <div class="zoom-controls">
-        <div class="zoom-btn" onclick="zoomTree(0.1)"><i class="fas fa-plus"></i></div>
-        <div class="zoom-btn" onclick="zoomTree(-0.1)"><i class="fas fa-minus"></i></div>
-        <div class="zoom-btn" onclick="resetZoom()"><i class="fas fa-sync-alt"></i></div>
+    <!-- Map Container -->
+    <div id="tree"></div>
+
+    <!-- Context Menu (Garis 3) -->
+    <div id="nodeContextMenu" class="node-menu shadow-xl">
+        <div class="menu-item font-bold border-b text-blue-800" id="menuName">Nama Anggota</div>
+        <div class="menu-item" onclick="handleMenu('edit')"><i class="fas fa-edit w-5"></i> Edit Profil</div>
+        <div class="menu-item admin-only" onclick="handleMenu('add_up')"><i class="fas fa-arrow-up w-5"></i> Tambah Orang Tua</div>
+        <div class="menu-item" onclick="handleMenu('add_spouse')"><i class="fas fa-heart w-5"></i> Tambah Suami/Istri</div>
+        <div class="menu-item" onclick="handleMenu('add_child')"><i class="fas fa-child w-5"></i> Tambah Anak</div>
+        <div class="menu-item border-t" onclick="handleMenu('bio')"><i class="fas fa-file-alt w-5"></i> Biografi</div>
+        <div class="menu-item danger border-t admin-only" id="delBtn" onclick="handleMenu('delete')"><i class="fas fa-trash w-5"></i> Hapus</div>
     </div>
 
-    <div class="tree-container" id="tree-container">
-        <div class="tree-wrapper" id="tree-wrapper">
-            <div class="tree" id="tree-root"></div>
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black/60 hidden z-[2000] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+            <h2 class="text-2xl font-bold mb-4 text-center">Login Sistem</h2>
+            <button onclick="doLogin('admin')" class="w-full bg-blue-700 text-white py-3 rounded-xl mb-3 font-bold flex items-center justify-center gap-2">
+                <i class="fas fa-user-shield"></i> Login sebagai Admin
+            </button>
+            <button onclick="doLogin('user')" class="w-full bg-blue-100 text-blue-800 py-3 rounded-xl font-bold flex items-center justify-center gap-2">
+                <i class="fas fa-user"></i> Login sebagai User
+            </button>
+            <p class="text-[10px] text-gray-400 mt-4 text-center text-italic">*Admin bisa tambah ke atas & hapus. User hanya bisa tambah ke bawah.</p>
+            <button onclick="toggleLoginModal()" class="w-full mt-4 text-gray-500 text-sm">Batal</button>
         </div>
     </div>
-</div>
 
-<!-- MODAL MANAJEMEN PROYEK (SILSILAH BARU) -->
-<div class="modal fade" id="projectManagementModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-info text-white border-0">
-                <h5 class="modal-title fw-bold"><i class="fas fa-folder-plus me-2"></i>Daftar Silsilah</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="input-group mb-3">
-                    <input type="text" id="new-project-name" class="form-control" placeholder="Nama Silsilah Baru...">
-                    <button class="btn btn-primary" onclick="createNewProject()">Buat</button>
+    <!-- Form Modal -->
+    <div id="formModal" class="fixed inset-0 bg-black/60 hidden z-[3000] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl">
+            <div id="formHeader" class="bg-blue-800 p-4 text-white font-bold">Edit Data</div>
+            <div class="p-6">
+                <input type="text" id="inpName" placeholder="Nama Lengkap" class="w-full border rounded-lg p-3 mb-4 outline-none focus:ring-2 focus:ring-blue-500">
+                <textarea id="inpBio" placeholder="Biografi singkat..." rows="4" class="w-full border rounded-lg p-3 mb-4 outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                <div class="flex gap-2">
+                    <button onclick="closeForm()" class="flex-1 py-3 text-gray-500 font-bold">Batal</button>
+                    <button onclick="submitForm()" class="flex-1 py-3 bg-blue-700 text-white rounded-xl font-bold">Simpan</button>
                 </div>
-                <div class="list-group" id="project-list-items">
-                    <!-- List Proyek Muncul di sini -->
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL MANAJEMEN USER -->
-<div class="modal fade" id="userManagementModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-warning border-0"><h5 class="modal-title fw-bold">Kelola Akun</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body">
-                <button class="btn btn-primary btn-sm mb-3" onclick="openUserForm('add')">Buat Akun Baru</button>
-                <div class="table-responsive"><table class="table table-sm"><thead><tr><th>User</th><th>Level</th><th>Aksi</th></tr></thead><tbody id="user-table-body"></tbody></table></div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- MODAL DETAIL NASAB -->
-<div class="modal fade" id="detailModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-            <div class="modal-header bg-primary text-white border-0"><h5 class="modal-title">Informasi Profil</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
-            <div class="modal-body text-center p-4">
-                <img id="detImg" src="" class="profile-img">
-                <h4 id="detName" class="fw-bold mb-1"></h4>
-                <p id="detSpouse" class="text-danger small fw-bold mb-3"></p>
-                <div class="row g-2 mb-3 text-center">
-                    <div class="col-4 border-end"><div>Gen</div><b id="detGen"></b></div>
-                    <div class="col-4 border-end"><div>Sdr</div><b id="detSiblings"></b></div>
-                    <div class="col-4"><div>Anak</div><b id="detChildren"></b></div>
-                </div>
-                <div class="text-start bg-light p-3 rounded mb-3" style="font-size: 0.85rem;">
-                    <b>Biografi:</b> <div id="detBio"></div><hr>
-                    <b>Alamat:</b> <div id="detAddress"></div>
-                </div>
-                <div id="contact-area"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL FORM DATA -->
-<div class="modal fade" id="nodeModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header fw-bold border-0">Data Anggota</div>
-            <div class="modal-body">
-                <div class="text-center mb-3">
-                    <img id="img-preview" src="" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; display: none;">
-                    <input type="file" id="inputPhoto" class="form-control form-control-sm mt-2" onchange="previewFile()">
-                </div>
-                <div class="mb-2"><label class="small">Nama Lengkap</label><input type="text" id="inputName" class="form-control"></div>
-                <div id="extended-fields">
-                    <div class="mb-2"><label class="small">WhatsApp</label><input type="number" id="inputPhone" class="form-control"></div>
-                    <div class="mb-2"><label class="small">Alamat</label><input type="text" id="inputAddress" class="form-control"></div>
-                    <div class="mb-2"><label class="small">Biografi</label><textarea id="inputBio" class="form-control" rows="2"></textarea></div>
-                </div>
-                <button class="btn btn-primary w-100 mt-3 fw-bold" onclick="saveData()">SIMPAN</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL FORM USER -->
-<div class="modal fade" id="userFormModal" tabindex="-1">
-    <div class="modal-dialog modal-sm modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-body">
-                <input type="hidden" id="user-old-username">
-                <input type="text" id="user-name" class="form-control mb-2" placeholder="Username">
-                <input type="text" id="user-pass" class="form-control mb-2" placeholder="Password">
-                <select id="user-role" class="form-select mb-3">
-                    <option value="administrator">Administrator</option>
-                    <option value="admin">Admin</option>
-                    <option value="viewer">User</option>
-                </select>
-                <button class="btn btn-primary w-100" onclick="saveAccount()">SIMPAN AKUN</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- CONTEXT MENU -->
-<div id="custom-menu">
-    <div id="role-admin-only"><button class="menu-item" onclick="handleMenuAction('edit')"><i class="fas fa-edit"></i> Edit Profil</button></div>
-    <div id="role-staff-access">
-        <button class="menu-item" onclick="handleMenuAction('child')"><i class="fas fa-plus-circle"></i> Tambah Anak</button>
-        <button class="menu-item" onclick="handleMenuAction('spouse')"><i class="fas fa-heart"></i> Tambah Pasangan</button>
-    </div>
-    <div id="role-delete-only"><button class="menu-item text-danger" onclick="handleMenuAction('delete')"><i class="fas fa-trash-alt"></i> Hapus</button></div>
-    <hr class="my-1">
-    <button class="menu-item" onclick="showDetailFromMenu()"><i class="fas fa-info-circle"></i> Detail</button>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-<script>
-    // --- DATABASE & PROJECTS ---
-    let systemUsers = JSON.parse(localStorage.getItem('nasabUsers')) || [
-        { username: 'boss', pass: 'boss123', role: 'administrator' },
-        { username: 'admin', pass: 'admin123', role: 'admin' },
-        { username: 'user', pass: 'user123', role: 'viewer' }
-    ];
-
-    // Daftar Proyek/Silsilah
-    let systemProjects = JSON.parse(localStorage.getItem('nasabProjects')) || [
-        { id: 'p1', name: 'Silsilah Utama' }
-    ];
-
-    let currentProjectId = localStorage.getItem('activeProjectId') || 'p1';
-    let familyData = []; 
-
-    let currentUser = null;
-    let selectedNodeId = null;
-    let currentAction = "";
-    let currentBase64 = "";
-    let scale = 1.0;
-
-    // --- INITIALIZATION ---
-    function login() {
-        const u = document.getElementById('username').value;
-        const p = document.getElementById('password').value;
-        const user = systemUsers.find(x => x.username === u && x.pass === p);
-        if (user) { currentUser = user; startApp(); } else { alert('Gagal Login!'); }
-    }
-
-    function logout() { location.reload(); }
-
-    function startApp() {
-        document.getElementById('login-page').classList.add('hidden');
-        document.getElementById('main-app').classList.remove('hidden');
-        if(currentUser.role === 'administrator') document.getElementById('admin-tools').classList.remove('hidden');
+    <script>
+        let chart;
+        let selectedNodeId = null;
+        let userRole = 'viewer'; // 'admin', 'user', 'viewer'
         
-        loadProjectList();
-        loadFamilyData();
-        renderTree();
-        setTimeout(centerTree, 300);
-    }
-
-    // --- PROJECT MANAGEMENT LOGIC ---
-    function loadProjectList() {
-        const select = document.getElementById('active-project-select');
-        select.innerHTML = systemProjects.map(p => `<option value="${p.id}" ${p.id === currentProjectId ? 'selected' : ''}>${p.name}</option>`).join('');
-    }
-
-    function switchProject(projectId) {
-        currentProjectId = projectId;
-        localStorage.setItem('activeProjectId', projectId);
-        loadFamilyData();
-        renderTree();
-        setTimeout(centerTree, 300);
-    }
-
-    function loadFamilyData() {
-        const storageKey = `nasabData_${currentProjectId}`;
-        familyData = JSON.parse(localStorage.getItem(storageKey)) || [
-            { id: "root", name: "Kepala Keluarga " + systemProjects.find(p => p.id === currentProjectId).name, parentId: null, spouse: "", bio: "", phone: "", address: "", photo: "" }
+        // Data awal jika localStorage kosong
+        let familyData = [
+            { id: 1, name: "Leluhur Pertama", bio: "Kakek Buyut" },
+            { id: 2, pid: 1, name: "Anak Pertama", bio: "" }
         ];
-    }
 
-    function openProjectManagement() {
-        renderProjectManagerList();
-        new bootstrap.Modal(document.getElementById('projectManagementModal')).show();
-    }
+        // 1. Inisialisasi Pohon
+        function init() {
+            const savedData = localStorage.getItem('myNasabData');
+            if (savedData) familyData = JSON.parse(savedData);
 
-    function renderProjectManagerList() {
-        const container = document.getElementById('project-list-items');
-        container.innerHTML = systemProjects.map(p => `
-            <div class="list-group-item d-flex justify-content-between align-items-center">
-                ${p.name}
-                ${p.id !== 'p1' ? `<button class="btn btn-sm btn-danger" onclick="deleteProject('${p.id}')"><i class="fas fa-trash"></i></button>` : ''}
-            </div>
-        `).join('');
-    }
+            chart = new OrgChart(document.getElementById("tree"), {
+                template: "ana",
+                mouseScrol: OrgChart.action.zoom,
+                nodeBinding: {
+                    field_0: "name",
+                    field_1: "bio"
+                },
+                // Klik untuk Android (munculkan menu kustom)
+                onNodeClick: function(args) {
+                    showMenu(args.node.id, args.event);
+                    return false;
+                }
+            });
 
-    function createNewProject() {
-        const name = document.getElementById('new-project-name').value;
-        if(!name) return;
-        const newId = 'p' + Date.now();
-        systemProjects.push({ id: newId, name: name });
-        localStorage.setItem('nasabProjects', JSON.stringify(systemProjects));
-        document.getElementById('new-project-name').value = '';
-        loadProjectList();
-        renderProjectManagerList();
-    }
-
-    function deleteProject(id) {
-        if(!confirm('Hapus seluruh data silsilah ini?')) return;
-        systemProjects = systemProjects.filter(p => p.id !== id);
-        localStorage.setItem('nasabProjects', JSON.stringify(systemProjects));
-        localStorage.removeItem(`nasabData_${id}`);
-        if(currentProjectId === id) switchProject('p1');
-        loadProjectList();
-        renderProjectManagerList();
-    }
-
-    // --- ZOOM & CENTER ---
-    function zoomTree(val) { scale += val; scale = Math.min(Math.max(0.3, scale), 3); document.getElementById('tree-wrapper').style.transform = `scale(${scale})`; }
-    function resetZoom() { scale = 1.0; document.getElementById('tree-wrapper').style.transform = `scale(1)`; centerTree(); }
-    function centerTree() {
-        const container = document.getElementById('tree-container');
-        const wrapper = document.getElementById('tree-wrapper');
-        container.scrollLeft = (wrapper.offsetWidth / 2) - (container.offsetWidth / 2) + 150;
-    }
-
-    // --- CORE RENDERING ---
-    function renderTree() {
-        const root = familyData.find(p => !p.parentId);
-        document.getElementById('tree-root').innerHTML = `<ul>${buildHtml(root)}</ul>`;
-    }
-
-    function buildHtml(person) {
-        if (!person) return "";
-        const children = familyData.filter(c => c.parentId === person.id);
-        const gen = getGeneration(person.id);
-        return `<li>
-            <div class="person-card" onclick="showDetail('${person.id}')" data-id="${person.id}">
-                <span class="gen-tag">Gen ${gen}</span>
-                <div class="name">${person.name}</div>
-                ${person.spouse ? `<div class="spouse"><i class="fas fa-heart"></i> ${person.spouse}</div>` : ''}
-            </div>
-            ${children.length > 0 ? `<ul>${children.map(c => buildHtml(c)).join('')}</ul>` : ''}
-        </li>`;
-    }
-
-    function getGeneration(id) {
-        let level = 1; let curr = familyData.find(p => p.id === id);
-        while (curr && curr.parentId) { level++; curr = familyData.find(p => p.id === curr.parentId); }
-        return level;
-    }
-
-    // --- MODAL & DATA HANDLERS ---
-    function showDetail(id) {
-        const p = familyData.find(x => x.id === id);
-        selectedNodeId = id;
-        document.getElementById('detName').innerText = p.name;
-        document.getElementById('detSpouse').innerText = p.spouse || "-";
-        document.getElementById('detGen').innerText = getGeneration(id);
-        document.getElementById('detSiblings').innerText = p.parentId ? familyData.filter(x => x.parentId === p.parentId).length - 1 : 0;
-        document.getElementById('detChildren').innerText = familyData.filter(x => x.parentId === id).length;
-        document.getElementById('detBio').innerText = p.bio || "-";
-        document.getElementById('detAddress').innerText = p.address || "-";
-        document.getElementById('detImg').src = p.photo || "https://via.placeholder.com/100?text=Foto";
-        
-        const contactArea = document.getElementById('contact-area');
-        if (p.phone) {
-            let waNum = p.phone.toString(); if(waNum.startsWith('0')) waNum = '62' + waNum.slice(1);
-            contactArea.innerHTML = `<a href="https://wa.me/${waNum}" target="_blank" class="btn-wa"><i class="fab fa-whatsapp"></i> Hubungi WhatsApp</a>`;
-        } else { contactArea.innerHTML = ""; }
-        new bootstrap.Modal(document.getElementById('detailModal')).show();
-    }
-
-    function previewFile() {
-        const file = document.getElementById('inputPhoto').files[0];
-        const reader = new FileReader();
-        reader.onloadend = () => { currentBase64 = reader.result; document.getElementById('img-preview').src = reader.result; document.getElementById('img-preview').style.display = "inline-block"; }
-        if (file) reader.readAsDataURL(file);
-    }
-
-    const menu = document.getElementById('custom-menu');
-    window.addEventListener('contextmenu', e => {
-        const card = e.target.closest('.person-card');
-        if (card) { 
-            e.preventDefault(); selectedNodeId = card.getAttribute('data-id');
-            const role = currentUser.role;
-            document.getElementById('role-admin-only').classList.toggle('hidden', role !== 'administrator');
-            document.getElementById('role-delete-only').classList.toggle('hidden', role !== 'administrator');
-            document.getElementById('role-staff-access').classList.toggle('hidden', role === 'viewer');
-            menu.style.display = 'block'; menu.style.left = e.pageX + 'px'; menu.style.top = e.pageY + 'px'; 
-        } else { menu.style.display = 'none'; }
-    });
-    window.addEventListener('click', () => menu.style.display = 'none');
-
-    function handleMenuAction(type) {
-        currentAction = type;
-        const p = familyData.find(x => x.id === selectedNodeId);
-        if (type === 'delete') { 
-            if(p.id === 'root') return alert('Akar tidak bisa dihapus');
-            if(confirm('Hapus?')) { familyData = familyData.filter(x => x.id !== selectedNodeId && x.parentId !== selectedNodeId); saveNasab(); } return; 
+            chart.load(familyData);
         }
-        document.getElementById('photo-field').classList.toggle('hidden', type === 'spouse');
-        document.getElementById('extended-fields').classList.toggle('hidden', type === 'spouse');
-        if (type === 'edit') {
-            document.getElementById('inputName').value = p.name; document.getElementById('inputPhone').value = p.phone || "";
-            document.getElementById('inputAddress').value = p.address || ""; document.getElementById('inputBio').value = p.bio || "";
-            currentBase64 = p.photo || ""; document.getElementById('img-preview').src = p.photo || "";
-            document.getElementById('img-preview').style.display = p.photo ? "inline-block" : "none";
-        } else {
-            document.getElementById('inputName').value = ""; document.getElementById('inputPhone').value = "";
-            document.getElementById('inputAddress').value = ""; document.getElementById('inputBio').value = "";
-            currentBase64 = ""; document.getElementById('img-preview').style.display = "none";
+
+        // 2. Sistem Login & Hak Akses
+        function toggleLoginModal() {
+            document.getElementById('loginModal').classList.toggle('hidden');
         }
-        new bootstrap.Modal(document.getElementById('nodeModal')).show();
-    }
 
-    function saveData() {
-        const n = document.getElementById('inputName').value;
-        const ph = document.getElementById('inputPhone').value;
-        const ad = document.getElementById('inputAddress').value;
-        const bi = document.getElementById('inputBio').value;
-        const idx = familyData.findIndex(x => x.id === selectedNodeId);
-        if (currentAction === 'edit') { familyData[idx].name = n; familyData[idx].phone = ph; familyData[idx].address = ad; familyData[idx].bio = bi; familyData[idx].photo = currentBase64; }
-        else if (currentAction === 'child') { familyData.push({ id: Date.now().toString(), name: n, parentId: selectedNodeId, spouse: "", bio: bi, phone: ph, address: ad, photo: currentBase64 }); }
-        else if (currentAction === 'spouse') familyData[idx].spouse = n;
-        saveNasab();
-        bootstrap.Modal.getInstance(document.getElementById('nodeModal')).hide();
-    }
+        function doLogin(role) {
+            userRole = role;
+            document.getElementById('displayUser').innerText = role === 'admin' ? 'Administrator' : 'Anggota Keluarga';
+            document.getElementById('displayRole').innerText = role === 'admin' ? 'Akses Penuh' : 'Akses Terbatas';
+            
+            // Atur visibilitas menu berdasarkan role
+            const adminMenus = document.querySelectorAll('.admin-only');
+            adminMenus.forEach(m => m.style.display = (role === 'admin' ? 'flex' : 'none'));
+            
+            toggleLoginModal();
+            alert("Berhasil login sebagai " + role);
+        }
 
-    // USER MGMT (Simplified for space)
-    function openUserManagement() { renderUserTable(); new bootstrap.Modal(document.getElementById('userManagementModal')).show(); }
-    function renderUserTable() { document.getElementById('user-table-body').innerHTML = systemUsers.map(u => `<tr><td>${u.username}</td><td>${u.role}</td><td><button class="btn btn-sm btn-outline-primary" onclick="openUserForm('edit','${u.username}')">Edit</button></td></tr>`).join(''); }
-    function openUserForm(mode, un = '') {
-        currentAction = mode;
-        if(mode === 'edit') { const u = systemUsers.find(x => x.username === un); document.getElementById('user-old-username').value = u.username; document.getElementById('user-name').value = u.username; document.getElementById('user-pass').value = u.pass; document.getElementById('user-role').value = u.role; }
-        else { document.getElementById('user-name').value = ""; document.getElementById('user-pass').value = ""; }
-        new bootstrap.Modal(document.getElementById('userFormModal')).show();
-    }
-    function saveAccount() {
-        const n = document.getElementById('user-name').value; const p = document.getElementById('user-pass').value; const r = document.getElementById('user-role').value;
-        if(currentAction === 'edit') { const i = systemUsers.findIndex(x => x.username === document.getElementById('user-old-username').value); systemUsers[i] = { username: n, pass: p, role: r }; }
-        else { systemUsers.push({ username: n, pass: p, role: r }); }
-        localStorage.setItem('nasabUsers', JSON.stringify(systemUsers)); renderUserTable(); bootstrap.Modal.getInstance(document.getElementById('userFormModal')).hide();
-    }
+        // 3. Menu Kontrol
+        function showMenu(id, event) {
+            selectedNodeId = id;
+            const nodeData = chart.get(id);
+            const menu = document.getElementById('nodeContextMenu');
+            document.getElementById('menuName').innerText = nodeData.name;
+            
+            // Cek jika user login atau viewer
+            if(userRole === 'viewer') {
+                alert("Silahkan login untuk mengedit data.");
+                return;
+            }
 
-    function saveNasab() { localStorage.setItem(`nasabData_${currentProjectId}`, JSON.stringify(familyData)); renderTree(); }
-    function showDetailFromMenu() { showDetail(selectedNodeId); menu.style.display = 'none'; }
-</script>
+            menu.style.display = 'block';
+            // Posisi responsif
+            let x = event.pageX > window.innerWidth - 200 ? event.pageX - 200 : event.pageX;
+            let y = event.pageY > window.innerHeight - 300 ? event.pageY - 250 : event.pageY;
+            
+            menu.style.left = x + 'px';
+            menu.style.top = y + 'px';
+        }
+
+        window.onclick = function(e) {
+            if(!e.target.closest('#nodeContextMenu')) {
+                document.getElementById('nodeContextMenu').style.display = 'none';
+            }
+        }
+
+        // 4. Operasi CRUD
+        let currentMode = '';
+        function handleMenu(mode) {
+            currentMode = mode;
+            const nodeData = chart.get(selectedNodeId);
+            document.getElementById('nodeContextMenu').style.display = 'none';
+
+            if (mode === 'delete') {
+                if(confirm("Hapus " + nodeData.name + " dan semua keturunannya?")) {
+                    chart.removeNode(selectedNodeId);
+                    saveData();
+                }
+                return;
+            }
+
+            if (mode === 'bio' || mode === 'edit') {
+                document.getElementById('formHeader').innerText = "Edit " + nodeData.name;
+                document.getElementById('inpName').value = nodeData.name;
+                document.getElementById('inpBio').value = nodeData.bio || "";
+            } else {
+                document.getElementById('formHeader').innerText = "Tambah Anggota Baru";
+                document.getElementById('inpName').value = "";
+                document.getElementById('inpBio').value = "";
+            }
+            
+            document.getElementById('formModal').classList.remove('hidden');
+        }
+
+        function closeForm() {
+            document.getElementById('formModal').classList.add('hidden');
+        }
+
+        function submitForm() {
+            const name = document.getElementById('inpName').value;
+            const bio = document.getElementById('inpBio').value;
+            const newId = Date.now();
+
+            if (currentMode === 'edit' || currentMode === 'bio') {
+                chart.updateNode({ id: selectedNodeId, name, bio });
+            } 
+            else if (currentMode === 'add_child') {
+                chart.addNode({ id: newId, pid: selectedNodeId, name, bio });
+            } 
+            else if (currentMode === 'add_spouse') {
+                chart.addNode({ id: newId, stpid: selectedNodeId, name, bio, tags: ["partner"] });
+            } 
+            else if (currentMode === 'add_up') {
+                // Logika tambah orang tua: geser parent lama ke orang tua baru
+                const current = chart.get(selectedNodeId);
+                const oldPid = current.pid;
+                chart.addNode({ id: newId, pid: oldPid, name, bio });
+                chart.updateNode({ id: selectedNodeId, pid: newId });
+            }
+
+            saveData();
+            closeForm();
+        }
+
+        // 5. Simpan Data
+        function saveData() {
+            const nodes = chart.getNodes();
+            localStorage.setItem('myNasabData', JSON.stringify(nodes));
+            console.log("Data tersimpan otomatis!");
+        }
+
+        window.onload = init;
+    </script>
 </body>
 </html>
