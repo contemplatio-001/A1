@@ -159,11 +159,9 @@
     async function syncWithCloud() {
         document.getElementById('cloud-info').innerText = "(Syncing...)";
         try {
-            // Panggil Serverless Function, bukan GitHub API secara langsung
             const res = await fetch('/.netlify/functions/github-proxy');
             if (res.ok) {
                 const d = await res.json();
-                // Konten dari GitHub sudah dalam format JSON, kita hanya perlu decode base64
                 const content = JSON.parse(atob(d.content));
                 if(content.family) familyData = content.family;
                 if(content.users) systemUsers = content.users;
@@ -183,20 +181,13 @@
     async function pushToCloud() {
         try {
             const combinedData = { family: familyData, users: systemUsers };
-            // Panggil Serverless Function kita dengan metode POST
             const response = await fetch('/.netlify/functions/github-proxy', {
                 method: 'POST',
-                body: JSON.stringify(combinedData, null, 2) // Kirim data sebagai string
+                body: JSON.stringify(combinedData, null, 2)
             });
-
-            if (!response.ok) {
-                console.error("Push to cloud failed with status:", response.status);
-            } else {
-                console.log("Push to cloud successful.");
-            }
-        } catch (e) {
-            console.error("Push to cloud failed:", e);
-        }
+            if (!response.ok) { console.error("Push to cloud failed with status:", response.status); } 
+            else { console.log("Push to cloud successful."); }
+        } catch (e) { console.error("Push to cloud failed:", e); }
     }
 
     // --- APP FLOW ---
@@ -232,7 +223,7 @@
         const container = document.getElementById('tree-root'), filterVal = document.getElementById('gen-filter').value;
         updateGenFilter();
         const rootNode = focusNodeId ? familyData.find(p => p.id === focusNodeId) : familyData.find(p => !p.parentId);
-        if (!rootNode) { container.innerHTML = `<div class="p-5 text-center text-muted">Data tidak ditemukan.</div>`; return; }
+        if (!rootNode) { container.innerHTML = `<div class="p-5 text-center text-muted">Data tidak ditemukan. Silakan login ulang atau sinkronisasi.</div>`; return; }
         if (filterVal === 'all') { container.innerHTML = `<ul>${buildTreeHtml(rootNode)}</ul>`; container.className = "tree"; }
         else { const members = familyData.filter(p => getGeneration(p.id) === parseInt(filterVal)); container.innerHTML = `<div class="gen-grid">${members.map(p => `<div class="person-card shadow-sm" onclick="showDetail('${p.id}')" data-id="${p.id}"><div class="name">${p.name}</div></div>`).join('')}</div>`; container.className = ""; }
     }
