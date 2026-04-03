@@ -1,1 +1,1 @@
-{"family":[{"id":"root","name":"Kepala Keluarga","parentId":null,"spouse":"","bio":"Pangkal silsilah keluarga.","phone":"","photo":""}],"users":[{"username":"1","pass":"1","role":"administrator"},{"username":"2","pass":"2","role":"administrator"}]}
+{"family":[{"id":"root","name":"Kepala Keluarga","parentId":null,"spouse":"","bio":"Pangkal silsilah keluarga.","phone":"","photo":""}],"users":[{"username":"1","pass":"1","role":"administrator"},{"username":"2","pass":"2","role":"administrator"},{"username":"admin","pass":"admin","role":"admin"}]}
