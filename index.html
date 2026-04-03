@@ -2,117 +2,516 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
-    <title>Nasab Pro - Blue AutoCloud</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nasab Pro - Personal Tree Edition</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary: #1a5276; --secondary: #2980b9; --accent: #d4e6f1; --wa: #25d366; --bg: #f4f7fb; }
-        body { background-color: var(--bg); font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; overflow: hidden; height: 100vh; width: 100vw; color: #333; }
-        #login-page { height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--primary), var(--secondary)); position: fixed; width: 100%; z-index: 5000; }
-        .navbar { background-color: var(--primary) !important; z-index: 1050; border-bottom: 3px solid var(--secondary); }
-        .offcanvas { background-color: var(--primary); color: white; width: 280px !important; }
-        .nav-link-custom { color: white; padding: 12px 20px; display: flex; align-items: center; text-decoration: none; border-radius: 8px; margin-bottom: 5px; }
-        .nav-link-custom:hover { background: rgba(255,255,255,0.2); color: #fff; }
-        .nav-link-custom i { width: 30px; font-size: 1.1rem; }
-        .viewport { width: 100vw; height: calc(100vh - 56px); overflow: hidden; position: relative; cursor: grab; background: #eef2f7; }
-        .viewport:active { cursor: grabbing; }
-        .tree-wrapper { position: absolute; transform-origin: 0 0; padding: 150px; display: inline-block; transition: transform 0.1s ease-out; }
-        .tree ul { padding-top: 25px; position: relative; display: flex; justify-content: center; padding-left: 0; }
-        .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 25px 5px 0 5px; }
-        .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #3498db; width: 50%; height: 25px; }
-        .tree li::after { right: auto; left: 50%; border-left: 2px solid #3498db; }
+        :root { --primary: #2c3e50; --secondary: #27ae60; --accent: #e67e22; --wa: #25d366; --bg: #f4f7f6; }
+        body { background-color: var(--bg); font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
+
+        #login-page {
+            height: 100vh; display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            position: fixed; width: 100%; z-index: 3000;
+        }
+
+        .tree-container { overflow: auto; padding: 40px 20px; text-align: center; min-height: 90vh; }
+        .gen-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px; }
+
+        .tree ul { padding-top: 20px; position: relative; display: flex; justify-content: center; }
+        .tree li { float: left; text-align: center; list-style-type: none; position: relative; padding: 20px 5px 0 5px; }
+        .tree li::before, .tree li::after { content: ''; position: absolute; top: 0; right: 50%; border-top: 2px solid #adb5bd; width: 50%; height: 20px; }
+        .tree li::after { right: auto; left: 50%; border-left: 2px solid #adb5bd; }
         .tree li:only-child::after, .tree li:only-child::before { display: none; }
         .tree li:only-child { padding-top: 0; }
         .tree li:first-child::before, .tree li:last-child::after { border: 0 none; }
-        .tree li:last-child::before { border-right: 2px solid #3498db; border-radius: 0 5px 0 0; }
+        .tree li:last-child::before { border-right: 2px solid #adb5bd; border-radius: 0 5px 0 0; }
         .tree li:first-child::after { border-radius: 5px 0 0 0; }
-        .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #3498db; width: 0; height: 25px; }
-        .person-card { border: 2px solid #d4e6f1; padding: 12px; display: inline-block; border-radius: 15px; background-color: white; min-width: 150px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); cursor: pointer; position: relative; z-index: 10; transition: 0.3s; }
-        .person-card:hover { border-color: var(--secondary); transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
-        .person-card .name { font-weight: bold; color: var(--primary); font-size: 0.9rem; }
-        .person-card .spouse { font-size: 0.75rem; color: #e74c3c; margin-top: 4px; border-top: 1px dashed #d4e6f1; padding-top: 4px; font-style: italic; }
-        .gen-tag { background: var(--secondary); color: white; padding: 1px 8px; border-radius: 10px; font-size: 0.6rem; margin-bottom: 5px; display: inline-block; font-weight: bold; }
-        .gen-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; padding: 30px; }
-        .zoom-controls { position: fixed; bottom: 25px; right: 25px; display: flex; flex-direction: column; gap: 12px; z-index: 2000; }
-        .btn-zoom { width: 50px; height: 50px; border-radius: 50%; background: white; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.2); font-size: 1.3rem; color: var(--primary); display: flex; align-items: center; justify-content: center; }
-        #custom-menu { position: absolute; display: none; z-index: 4000; background: white; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); min-width: 190px; overflow: hidden; border: 1px solid var(--accent); }
-        .menu-item { padding: 12px 18px; cursor: pointer; display: flex; align-items: center; font-size: 0.9rem; border: none; width: 100%; background: none; text-align: left; }
-        .menu-item:hover { background: #f0f7ff; color: var(--secondary); }
-        .menu-item i { width: 28px; color: var(--secondary); }
+        .tree ul ul::before { content: ''; position: absolute; top: 0; left: 50%; border-left: 2px solid #adb5bd; width: 0; height: 20px; }
+
+        .person-card {
+            border: 2px solid #dee2e6; padding: 12px; display: inline-block; border-radius: 12px;
+            background-color: white; min-width: 150px; box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            cursor: pointer; transition: 0.2s; user-select: none;
+        }
+        .person-card:hover { transform: translateY(-5px); border-color: var(--secondary); }
+        .person-card .name { font-weight: bold; color: var(--primary); font-size: 0.95rem; }
+        .person-card .spouse { font-size: 0.75rem; color: #e74c3c; margin-top: 4px; padding-top: 4px; border-top: 1px dashed #eee; }
+
+        .gen-tag { background: var(--accent); color: white; padding: 1px 8px; border-radius: 8px; font-size: 0.65rem; margin-bottom: 5px; display: inline-block; font-weight: bold; }
+
+        #custom-menu {
+            position: absolute; display: none; z-index: 4000; background: white;
+            border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.25); min-width: 200px; overflow: hidden;
+        }
+        .menu-header { background: #f8f9fa; padding: 10px 15px; font-size: 0.75rem; font-weight: bold; color: #777; border-bottom: 1px solid #eee; }
+        .menu-item { padding: 12px 15px; cursor: pointer; display: flex; align-items: center; font-size: 0.9rem; color: #333; border: none; width: 100%; background: none; text-align: left; }
+        .menu-item i { width: 25px; color: var(--primary); }
+        .menu-item:hover { background-color: #f1f3f5; }
+
+        .profile-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 15px; background: #eee; }
+        .stat-box { padding: 8px; border-radius: 10px; background: #f8f9fa; border: 1px solid #eee; }
+        .stat-value { font-size: 1.1rem; font-weight: bold; color: var(--primary); display: block; }
+        .stat-label { font-size: 0.6rem; color: #888; text-transform: uppercase; }
+        .info-section { background: #fff; border-radius: 12px; padding: 12px; margin-top: 15px; text-align: left; border: 1px solid #eee; }
+        .info-title { font-size: 0.7rem; font-weight: bold; color: #aaa; text-transform: uppercase; display: block; margin-bottom: 3px; }
+
+        .btn-wa { background-color: var(--wa); color: white; border-radius: 10px; font-weight: bold; padding: 10px; text-decoration: none; display: block; margin-top: 15px; text-align: center; }
+        .lineage-path { background: #eef2f7; border-radius: 10px; padding: 10px; margin-top: 15px; text-align: left; border-left: 4px solid var(--primary); font-size: 0.8rem; }
+
+        #img-preview { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; display: none; margin-bottom: 10px; border: 2px solid var(--secondary); }
+
         .hidden { display: none !important; }
-        .profile-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 15px; }
-        .lineage-path-box { background: var(--accent); padding: 10px; border-radius: 10px; color: var(--primary); font-size: 0.85rem; font-weight: 600; text-align: left; margin-bottom: 15px; }
-        .sync-status { font-size: 0.7rem; margin-left: 8px; font-weight: normal; }
-        .stat-box { background-color: #f8f9fa; padding: 8px; border-radius: 8px; }
-        .stat-label { font-size: 0.7rem; color: #6c757d; display: block; margin-bottom: 2px; }
-        .stat-value { font-size: 1rem; font-weight: bold; color: var(--primary); }
+        .sync-status { font-size: 0.65rem; color: #2ecc71; margin-left: 5px; }
+        .nav-select { background: #34495e; color: white; border: none; border-radius: 5px; font-size: 0.8rem; padding: 5px; outline: none; }
+
+        .focus-mode-alert { background: #e67e22; color: white; padding: 5px 15px; font-size: 0.8rem; text-align: center; }
+        .role-badge { background: #f1c40f; color: #2d3436; font-weight: 700; border-radius: 999px; font-size: 0.65rem; padding: 2px 8px; margin-left: 8px; }
     </style>
 </head>
 <body>
-<!-- KONTEN HTML LENGKAP SAMA SEPERTI SEBELUMNYA -->
-<div id="login-page">...</div>
-<div id="main-app" class="hidden">...</div>
-<!-- SEMUA MODAL -->
+
+<div id="login-page">
+    <div class="card p-4 shadow-lg border-0" style="width: 320px; border-radius: 20px;">
+        <div class="text-center mb-4">
+            <div class="bg-primary text-white d-inline-block p-3 rounded-circle mb-2"><i class="fas fa-sitemap fa-2x"></i></div>
+            <h4 class="fw-bold">Nasab Pro</h4>
+        </div>
+        <div class="mb-3"><label class="form-label small fw-bold">Username</label><input type="text" id="username" class="form-control" value="boss"></div>
+        <div class="mb-3"><label class="form-label small fw-bold">Password</label><input type="password" id="password" class="form-control" value="boss123"></div>
+        <button class="btn btn-primary w-100 py-2 fw-bold" onclick="login()">MASUK</button>
+    </div>
+</div>
+
+<div id="main-app" class="hidden">
+    <nav class="navbar navbar-dark bg-dark sticky-top px-3 shadow">
+        <span class="navbar-brand mb-0 h1" style="font-size: 1.1rem;">
+            <i class="fas fa-leaf text-success me-1"></i>NasabCloud <span id="cloud-info" class="sync-status"></span>
+            <span id="role-badge" class="role-badge"></span>
+        </span>
+
+        <div class="d-flex align-items-center">
+            <div class="me-2 d-flex align-items-center">
+                <select id="gen-filter" class="nav-select" onchange="resetFocusAndRender()">
+                    <option value="all">Semua Gen (Pohon)</option>
+                    <option value="1">Generasi 1</option>
+                    <option value="2">Generasi 2</option>
+                    <option value="3">Generasi 3</option>
+                    <option value="4">Generasi 4</option>
+                    <option value="5">Generasi 5</option>
+                    <option value="6">Generasi 6</option>
+                </select>
+            </div>
+
+            <button id="btn-back-main" class="btn btn-outline-warning btn-sm me-1 hidden" onclick="resetFocusAndRender()">
+                <i class="fas fa-home"></i> Utama
+            </button>
+
+            <button class="btn btn-outline-success btn-sm me-1" title="Sync Cloud" onclick="syncWithCloud()"><i class="fas fa-sync-alt"></i></button>
+            <button id="btn-manage-users" class="btn btn-warning btn-sm me-1 hidden" onclick="openUserManagement()"><i class="fas fa-users-cog"></i></button>
+            <button class="btn btn-outline-light btn-sm" onclick="logout()"><i class="fas fa-power-off"></i></button>
+        </div>
+    </nav>
+
+    <div id="focus-banner" class="focus-mode-alert hidden">
+        Mode Fokus: Menampilkan keturunan dari <b id="focus-name"></b>
+    </div>
+
+    <div class="tree-container">
+        <div id="tree-root" class="tree"></div>
+    </div>
+</div>
+
+<div id="custom-menu">
+    <div class="menu-header">NAVIGASI DATA</div>
+    <div id="role-staff-access">
+        <button class="menu-item" onclick="handleMenuAction('child')"><i class="fas fa-child"></i> Tambah Anak</button>
+        <button class="menu-item" onclick="handleMenuAction('spouse')"><i class="fas fa-ring"></i> Tambah Pasangan</button>
+        <button class="menu-item" onclick="handleMenuAction('edit')"><i class="fas fa-edit"></i> Edit Profil</button>
+    </div>
+    <div id="role-admin-only">
+        <button class="menu-item text-danger" onclick="handleMenuAction('delete')"><i class="fas fa-trash"></i> Hapus</button>
+    </div>
+    <hr class="my-1">
+    <button class="menu-item" onclick="showDetailFromMenu()"><i class="fas fa-search-plus"></i> Detail Lengkap</button>
+</div>
+
+<div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-body text-center p-4">
+                <button type="button" class="btn-close float-end" data-bs-dismiss="modal"></button>
+                <img id="detImg" src="" class="profile-img mt-2">
+                <h4 id="detName" class="fw-bold mb-0"></h4>
+                <p id="detSpouse" class="text-danger small fw-bold mb-3"></p>
+                <div class="row g-2 mb-3">
+                    <div class="col-4"><div class="stat-box"><span class="stat-label">Gen</span><span id="detGen" class="stat-value"></span></div></div>
+                    <div class="col-4"><div class="stat-box"><span class="stat-label">Anak</span><span id="detChildren" class="stat-value"></span></div></div>
+                    <div class="col-4"><div class="stat-box"><span class="stat-label">Saudara</span><span id="detSiblings" class="stat-value"></span></div></div>
+                </div>
+
+                <button class="btn btn-primary btn-sm w-100 mb-3 shadow-sm" onclick="setFocusTree()">
+                    <i class="fas fa-project-diagram me-2"></i>Lihat Pohon Keturunan
+                </button>
+
+                <div class="info-section"><span class="info-title">Biografi</span><div id="detBio" class="small text-start"></div></div>
+                <div id="contact-area"></div>
+                <div class="lineage-path"><span class="info-title">Silsilah Ke Atas</span><div id="detPath"></div></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="nodeModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0"><h6 class="fw-bold mb-0">Input Data</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="text-center mb-3" id="photo-field">
+                    <img id="img-preview" src="" alt="preview">
+                    <input type="file" id="inputPhoto" class="form-control form-control-sm" accept="image/*" onchange="previewFile()">
+                </div>
+                <div class="mb-2"><label class="small fw-bold">Nama Lengkap</label><input type="text" id="inputName" class="form-control form-control-sm"></div>
+                <div id="extended-fields">
+                    <div class="mb-2"><label class="small fw-bold">No. WA (62...)</label><input type="number" id="inputPhone" class="form-control form-control-sm"></div>
+                    <div class="mb-2"><label class="small fw-bold">Biografi</label><textarea id="inputBio" class="form-control form-control-sm" rows="2"></textarea></div>
+                </div>
+            </div>
+            <div class="modal-footer border-0"><button class="btn btn-primary w-100 fw-bold btn-sm" onclick="saveData()">SIMPAN</button></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="userModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0"><h6 class="fw-bold mb-0">Manajemen Pengguna</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+                <div class="mb-2"><label class="small fw-bold">Username</label><input type="text" id="newUserName" class="form-control form-control-sm"></div>
+                <div class="mb-2"><label class="small fw-bold">Password</label><input type="password" id="newUserPass" class="form-control form-control-sm"></div>
+                <div class="mb-3">
+                    <label class="small fw-bold">Role</label>
+                    <select id="newUserRole" class="form-select form-select-sm">
+                        <option value="viewer">viewer</option>
+                        <option value="staff">staff</option>
+                        <option value="administrator">administrator</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary w-100 btn-sm" onclick="addUser()">Tambah Pengguna</button>
+                <hr>
+                <div id="usersList" class="small"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-    // --- STATE ---
-    let familyData = JSON.parse(localStorage.getItem('nasabData')) || [{ id: "root", name: "Kepala Keluarga", parentId: null, spouse: "", bio: "Pangkal silsilah keluarga.", phone: "", photo: "" }];
-    let systemUsers = JSON.parse(localStorage.getItem('nasabUsers')) || [{ username: 'boss', pass: 'boss123', role: 'administrator' }];
-    let currentUser = null, selectedNodeId = null, currentBase64 = "", currentAction = null, focusNodeId = null;
+    const DEFAULT_DATA = [
+        { id: "root", name: "Kepala Keluarga", parentId: null, spouse: "", bio: "Luhur pertama.", phone: "", photo: "" }
+    ];
+    const DEFAULT_USERS = [{ username: 'boss', pass: 'boss123', role: 'administrator' }];
 
-    // --- ZOOM & PAN ENGINE ---
-    let scale = 0.8, posX = 0, posY = 0;
-    const viewport = document.getElementById('viewport'), wrapper = document.getElementById('tree-wrapper');
-    let isDragging = false, startX, startY;
-    viewport.addEventListener('mousedown', e => { isDragging = true; startX = e.clientX - posX; startY = e.clientY - posY; });
-    window.addEventListener('mousemove', e => { if (isDragging) { posX = e.clientX - startX; posY = e.clientY - startY; updateTransform(); } });
-    window.addEventListener('mouseup', () => isDragging = false);
-    viewport.addEventListener('touchstart', e => { if(e.touches.length === 1) { isDragging = true; startX = e.touches[0].clientX - posX; startY = e.touches[0].clientY - posY; e.preventDefault();} });
-    viewport.addEventListener('touchmove', e => { if(isDragging && e.touches.length === 1) { posX = e.touches[0].clientX - startX; posY = e.touches[0].clientY - startY; updateTransform(); e.preventDefault();} });
-    viewport.addEventListener('touchend', () => isDragging = false);
-    function changeZoom(d) { scale = Math.min(Math.max(0.3, scale + d), 3); updateTransform(); }
-    function resetZoom() { scale = 0.8; posX = (viewport.offsetWidth - wrapper.offsetWidth * scale) / 2; posY = 50; updateTransform(); }
-    function updateTransform() { wrapper.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`; }
+    let familyData = [...DEFAULT_DATA];
+    let systemUsers = [...DEFAULT_USERS];
 
-    // --- SECURE CLOUD ENGINE ---
+    let currentUser = null;
+    let selectedNodeId = null;
+    let currentAction = "";
+    let currentBase64 = "";
+    let focusNodeId = null;
+
     async function syncWithCloud() {
-        document.getElementById('cloud-info').innerText = "(Syncing...)";
+        const cloudInfo = document.getElementById('cloud-info');
+        cloudInfo.innerText = "(Syncing...)";
         try {
-            const res = await fetch('/.netlify/functions/github-proxy');
-            if (res.ok) {
-                const d = await res.json();
-                const content = JSON.parse(atob(d.content));
-                if(content.family) familyData = content.family;
-                if(content.users) systemUsers = content.users;
-                localStorage.setItem('nasabData', JSON.stringify(familyData));
-                localStorage.setItem('nasabUsers', JSON.stringify(systemUsers));
-                if (currentUser) renderTree();
-                document.getElementById('cloud-info').innerText = "(Connected)";
-            } else {
-                document.getElementById('cloud-info').innerText = `(Error: ${res.status})`;
-            }
-        } catch (e) {
-            console.error("Sync Error:", e);
-            document.getElementById('cloud-info').innerText = "(Offline)";
+            const res = await fetch('/.netlify/functions/nasab-data');
+            if (!res.ok) throw new Error('Gagal mengambil data cloud');
+            const payload = await res.json();
+            familyData = Array.isArray(payload.family) && payload.family.length > 0 ? payload.family : [...DEFAULT_DATA];
+            systemUsers = Array.isArray(payload.users) && payload.users.length > 0 ? payload.users : [...DEFAULT_USERS];
+            renderTree();
+            cloudInfo.innerText = "(Cloud Connected)";
+        } catch (error) {
+            cloudInfo.innerText = "(Offline)";
+            console.error(error);
         }
     }
 
     async function pushToCloud() {
         try {
-            const combinedData = { family: familyData, users: systemUsers };
-            const response = await fetch('/.netlify/functions/github-proxy', {
+            await fetch('/.netlify/functions/nasab-data', {
                 method: 'POST',
-                body: JSON.stringify(combinedData, null, 2)
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ family: familyData, users: systemUsers })
             });
-            if (!response.ok) { console.error("Push to cloud failed with status:", response.status); } 
-            else { console.log("Push to cloud successful."); }
-        } catch (e) { console.error("Push to cloud failed:", e); }
+        } catch (error) {
+            console.error(error);
+        }
     }
 
-    // --- SISA KODE JAVASCRIPT LENGKAP SAMA SEPERTI SEBELUMNYA ---
-    // (login, startApp, renderTree, showDetail, dll)
-    // ...
+    function renderTree() {
+        const container = document.getElementById('tree-root');
+        const filterVal = document.getElementById('gen-filter').value;
+        const btnBack = document.getElementById('btn-back-main');
+        const banner = document.getElementById('focus-banner');
+
+        if (focusNodeId) {
+            container.className = "tree";
+            const focusRoot = familyData.find(p => p.id === focusNodeId);
+            container.innerHTML = `<ul>${buildTreeHtml(focusRoot)}</ul>`;
+            btnBack.classList.remove('hidden');
+            banner.classList.remove('hidden');
+            document.getElementById('focus-name').innerText = focusRoot ? focusRoot.name : '-';
+        } else if (filterVal === 'all') {
+            container.className = "tree";
+            const root = familyData.find(p => !p.parentId);
+            container.innerHTML = `<ul>${buildTreeHtml(root)}</ul>`;
+            btnBack.classList.add('hidden');
+            banner.classList.add('hidden');
+        } else {
+            container.className = "gen-grid";
+            const members = familyData.filter(p => getGeneration(p.id) === parseInt(filterVal, 10));
+            container.innerHTML = members.map(p => `<div class="person-card" data-id="${p.id}" onclick="showDetail('${p.id}')">${p.name}</div>`).join('');
+            btnBack.classList.add('hidden');
+            banner.classList.add('hidden');
+        }
+    }
+
+    function buildTreeHtml(person) {
+        if (!person) return "";
+        const children = familyData.filter(c => c.parentId === person.id);
+        const gen = getGeneration(person.id);
+        return `<li>
+            <div class="person-card shadow-sm" onclick="showDetail('${person.id}')" data-id="${person.id}">
+                <span class="gen-tag">Gen ${gen}</span>
+                <div class="name">${person.name}</div>
+                ${person.spouse ? `<div class="spouse"><i class="fas fa-heart"></i> ${person.spouse}</div>` : ''}
+            </div>
+            ${children.length > 0 ? `<ul>${children.map(c => buildTreeHtml(c)).join('')}</ul>` : ''}
+        </li>`;
+    }
+
+    function getGeneration(id) {
+        let level = 1;
+        let curr = familyData.find(p => p.id === id);
+        while (curr && curr.parentId) {
+            level++;
+            curr = familyData.find(p => p.id === curr.parentId);
+        }
+        return level;
+    }
+
+    function setFocusTree() {
+        focusNodeId = selectedNodeId;
+        bootstrap.Modal.getInstance(document.getElementById('detailModal')).hide();
+        renderTree();
+    }
+
+    function resetFocusAndRender() {
+        focusNodeId = null;
+        renderTree();
+    }
+
+    function login() {
+        const u = document.getElementById('username').value;
+        const p = document.getElementById('password').value;
+        const user = systemUsers.find(x => x.username === u && x.pass === p);
+        if (user) {
+            currentUser = user;
+            startApp();
+        } else {
+            alert('Gagal!');
+        }
+    }
+
+    function startApp() {
+        document.getElementById('login-page').classList.add('hidden');
+        document.getElementById('main-app').classList.remove('hidden');
+        document.getElementById('role-badge').innerText = currentUser.role.toUpperCase();
+        if (currentUser.role === 'administrator') {
+            document.getElementById('btn-manage-users').classList.remove('hidden');
+        }
+        renderTree();
+        syncWithCloud();
+    }
+
+    function showDetail(id) {
+        const p = familyData.find(x => x.id === id);
+        if (!p) return;
+        selectedNodeId = id;
+        document.getElementById('detName').innerText = p.name;
+        document.getElementById('detSpouse').innerText = p.spouse ? "Pasangan: " + p.spouse : "";
+        document.getElementById('detGen').innerText = getGeneration(id);
+        document.getElementById('detChildren').innerText = familyData.filter(x => x.parentId === id).length;
+        document.getElementById('detSiblings').innerText = p.parentId ? familyData.filter(x => x.parentId === p.parentId).length - 1 : 0;
+        document.getElementById('detImg').src = p.photo || "https://via.placeholder.com/100?text=No+Photo";
+        document.getElementById('detBio').innerText = p.bio || "-";
+
+        const path = [];
+        let c = p;
+        while (c) {
+            path.push(c.name);
+            c = familyData.find(x => x.id === c.parentId);
+        }
+        document.getElementById('detPath').innerHTML = path.reverse().map(n => `<b class="text-primary">${n}</b>`).join(' > ');
+
+        const contactArea = document.getElementById('contact-area');
+        if (p.phone) {
+            let wa = p.phone.toString();
+            if (wa.startsWith('0')) wa = '62' + wa.slice(1);
+            contactArea.innerHTML = `<a href="https://wa.me/${wa}" target="_blank" class="btn-wa shadow-sm"><i class="fab fa-whatsapp me-2"></i>WA Keluarga</a>`;
+        } else {
+            contactArea.innerHTML = "";
+        }
+
+        new bootstrap.Modal(document.getElementById('detailModal')).show();
+    }
+
+    function handleMenuAction(type) {
+        currentAction = type;
+        const p = familyData.find(x => x.id === selectedNodeId);
+        if (!p) return;
+
+        if (type === 'delete') {
+            if (confirm('Hapus Data?')) {
+                familyData = familyData.filter(x => x.id !== selectedNodeId && x.parentId !== selectedNodeId);
+                saveNasab();
+            }
+            return;
+        }
+
+        document.getElementById('photo-field').classList.toggle('hidden', type === 'spouse');
+        document.getElementById('extended-fields').classList.toggle('hidden', type === 'spouse');
+
+        if (type === 'edit') {
+            document.getElementById('inputName').value = p.name;
+            document.getElementById('inputPhone').value = p.phone || "";
+            document.getElementById('inputBio').value = p.bio || "";
+            currentBase64 = p.photo || "";
+            document.getElementById('img-preview').src = currentBase64;
+            document.getElementById('img-preview').style.display = currentBase64 ? "inline-block" : "none";
+        } else {
+            document.getElementById('inputName').value = "";
+            document.getElementById('inputPhone').value = "";
+            document.getElementById('inputBio').value = "";
+            currentBase64 = "";
+            document.getElementById('img-preview').style.display = "none";
+            document.getElementById('inputPhoto').value = "";
+        }
+
+        new bootstrap.Modal(document.getElementById('nodeModal')).show();
+    }
+
+    function saveData() {
+        const n = document.getElementById('inputName').value.trim();
+        const ph = document.getElementById('inputPhone').value;
+        const bi = document.getElementById('inputBio').value;
+        if (!n) {
+            alert('Nama wajib diisi');
+            return;
+        }
+
+        if (currentAction === 'edit') {
+            const idx = familyData.findIndex(x => x.id === selectedNodeId);
+            familyData[idx].name = n;
+            familyData[idx].phone = ph;
+            familyData[idx].bio = bi;
+            familyData[idx].photo = currentBase64;
+        } else if (currentAction === 'child') {
+            familyData.push({ id: Date.now().toString(), name: n, parentId: selectedNodeId, spouse: "", bio: bi, phone: ph, photo: currentBase64 });
+        } else if (currentAction === 'spouse') {
+            familyData.find(x => x.id === selectedNodeId).spouse = n;
+        }
+
+        saveNasab();
+        bootstrap.Modal.getInstance(document.getElementById('nodeModal')).hide();
+    }
+
+    function saveNasab() {
+        renderTree();
+        pushToCloud();
+    }
+
+    function previewFile() {
+        const file = document.getElementById('inputPhoto').files[0];
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            currentBase64 = reader.result;
+            document.getElementById('img-preview').src = reader.result;
+            document.getElementById('img-preview').style.display = "inline-block";
+        };
+        if (file) reader.readAsDataURL(file);
+    }
+
+    function openUserManagement() {
+        renderUsers();
+        new bootstrap.Modal(document.getElementById('userModal')).show();
+    }
+
+    function renderUsers() {
+        document.getElementById('usersList').innerHTML = systemUsers.map((u, i) => {
+            const canDelete = i > 0;
+            return `<div class="d-flex justify-content-between align-items-center mb-1 border rounded p-2"><span>${u.username} <span class="text-muted">(${u.role})</span></span>${canDelete ? `<button class="btn btn-sm btn-outline-danger" onclick="removeUser(${i})">hapus</button>` : ''}</div>`;
+        }).join('');
+    }
+
+    function addUser() {
+        const username = document.getElementById('newUserName').value.trim();
+        const pass = document.getElementById('newUserPass').value;
+        const role = document.getElementById('newUserRole').value;
+
+        if (!username || !pass) {
+            alert('Username dan password wajib diisi');
+            return;
+        }
+        if (systemUsers.some(u => u.username === username)) {
+            alert('Username sudah ada');
+            return;
+        }
+
+        systemUsers.push({ username, pass, role });
+        renderUsers();
+        pushToCloud();
+    }
+
+    function removeUser(index) {
+        systemUsers.splice(index, 1);
+        renderUsers();
+        pushToCloud();
+    }
+
+    const menu = document.getElementById('custom-menu');
+    window.addEventListener('contextmenu', e => {
+        const card = e.target.closest('.person-card');
+        if (card && currentUser) {
+            e.preventDefault();
+            selectedNodeId = card.getAttribute('data-id');
+            const r = currentUser.role;
+            document.getElementById('role-admin-only').classList.toggle('hidden', r !== 'administrator');
+            document.getElementById('role-staff-access').classList.toggle('hidden', r === 'viewer');
+            menu.style.display = 'block';
+            menu.style.left = e.pageX + 'px';
+            menu.style.top = e.pageY + 'px';
+        } else {
+            menu.style.display = 'none';
+        }
+    });
+    window.addEventListener('click', () => {
+        menu.style.display = 'none';
+    });
+
+    function showDetailFromMenu() {
+        showDetail(selectedNodeId);
+    }
+
+    function logout() {
+        location.reload();
+    }
+
+    syncWithCloud();
 </script>
 </body>
 </html>
